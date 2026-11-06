@@ -63,36 +63,54 @@ try {
   }
   if (!browser) throw new Error('No Edge or Chrome found for Playwright');
 
-  const context = await browser.newContext({
-    viewport: { width: 390, height: 780 },
-    deviceScaleFactor: 2,
-    geolocation: { latitude: 55.9533, longitude: -3.1883 },
-    permissions: ['geolocation'],
-  });
-  const page = await context.newPage();
-  await page.addInitScript((url) => localStorage.setItem('nhs.apiUrl', url), API);
-  await page.goto(WEB);
+  const open = async (colorScheme) => {
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 780 },
+      deviceScaleFactor: 2,
+      colorScheme,
+      geolocation: { latitude: 55.9533, longitude: -3.1883 },
+      permissions: ['geolocation'],
+    });
+    const page = await context.newPage();
+    await page.addInitScript((url) => localStorage.setItem('nhs.apiUrl', url), API);
+    await page.goto(WEB);
+    await page.getByRole('button', { name: 'Change search location' }).waitFor({ timeout: 30000 });
+    await page
+      .getByText(/ km$| m$/)
+      .first()
+      .waitFor({ timeout: 30000 });
+    return page;
+  };
 
-  await page.getByText(/^From:/).waitFor({ timeout: 30000 });
-  await page
-    .getByText(/ km$| m$/)
+  const light = await open('light');
+  await light.screenshot({ path: resolve(out, 'nearby-list.png') });
+
+  await light.getByRole('tab', { name: 'Show map' }).click();
+  await light.locator('.leaflet-container').waitFor();
+  await light.waitForTimeout(4000);
+  await light.screenshot({ path: resolve(out, 'nearby-map.png') });
+
+  await light.getByRole('tab', { name: 'Show list' }).click();
+  await light
+    .getByRole('button', { name: /^.+, Pharmacy, .+ away/ })
     .first()
-    .waitFor({ timeout: 30000 });
-  await page.screenshot({ path: resolve(out, 'nearby-list.png') });
+    .click();
+  await light.getByRole('button', { name: 'Go back' }).waitFor();
+  await light.waitForTimeout(500);
+  await light.screenshot({ path: resolve(out, 'facility.png') });
 
-  await page.getByRole('button', { name: 'Show map' }).click();
-  await page.locator('.leaflet-container').waitFor();
-  await page.waitForTimeout(4000);
-  await page.screenshot({ path: resolve(out, 'nearby-map.png') });
+  await light.getByRole('button', { name: 'Go back' }).click();
+  await light.getByRole('tab', { name: /Ask/ }).click();
+  await light.getByLabel('Your question').fill('where is the closest A&E to Partick');
+  await light.getByRole('button', { name: 'Ask', exact: true }).click();
+  await light.getByText(/^Sources:/).waitFor({ timeout: 30000 });
+  await light.screenshot({ path: resolve(out, 'ask.png') });
 
-  await page.getByRole('tab', { name: /Ask/ }).click();
-  await page.getByLabel('Your question').fill('where is the closest A&E to Partick');
-  await page.getByRole('button', { name: 'Ask', exact: true }).click();
-  await page.getByText(/^Sources:/).waitFor({ timeout: 30000 });
-  await page.screenshot({ path: resolve(out, 'ask.png') });
+  const dark = await open('dark');
+  await dark.screenshot({ path: resolve(out, 'nearby-list-dark.png') });
 
   await browser.close();
-  console.log('Wrote docs/nearby-list.png, docs/nearby-map.png, docs/ask.png');
+  console.log('Wrote nearby-list, nearby-map, facility, ask and nearby-list-dark to docs/');
 } finally {
   for (const child of [api, web]) {
     if (process.platform === 'win32') {

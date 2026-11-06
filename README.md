@@ -2,9 +2,9 @@
 
 Find the nearest GP, pharmacy, dentist, hospital or A&E in Scotland from NHS Scotland open data, on iOS, Android and the web from one TypeScript codebase, with a natural-language box that answers "nearest pharmacy to EH8 9YL" or "where is the closest A&E to Partick" and cites the rows it used.
 
-| Nearby (list) | Nearby (map) | Ask |
-|---|---|---|
-| ![Nearby list](docs/nearby-list.png) | ![Nearby map](docs/nearby-map.png) | ![Ask](docs/ask.png) |
+| Nearby (list) | Nearby (map) | Ask | Facility detail | Nearby (dark) |
+|---|---|---|---|---|
+| ![Nearby list](docs/nearby-list.png) | ![Nearby map](docs/nearby-map.png) | ![Ask](docs/ask.png) | ![Facility detail](docs/facility.png) | ![Nearby list, dark mode](docs/nearby-list-dark.png) |
 
 Screenshots are the web export rendered by headless Playwright (`make screenshots`) against the committed sample data. No iOS or Android build was possible on the machine this was written on (no Java, Android SDK or Xcode), so the native paths are type-checked and unit-tested with mocks but have not been run on a device. See [Known limitations](#known-limitations).
 
