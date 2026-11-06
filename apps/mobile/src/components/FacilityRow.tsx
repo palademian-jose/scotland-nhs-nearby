@@ -2,15 +2,21 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CATEGORY_LABELS, type NearbyResult } from '../api/types';
 import { formatDistance } from '../lib/geo';
-import { colors, MIN_TARGET, spacing } from '../theme';
+import { MIN_TARGET, useTheme } from '../theme';
+import { Badge } from './ui';
 
 interface Props {
   item: NearbyResult;
+  /** Citation number, shown in a small accent circle (Ask results). */
   index?: number;
+  /** Outlines the card, used when its marker is selected on the map. */
+  selected?: boolean;
   onPress: (item: NearbyResult) => void;
 }
 
-export function FacilityRow({ item, index, onPress }: Props) {
+/** One result as a card: name, address, health board tag and a distance badge. */
+export function FacilityRow({ item, index, selected = false, onPress }: Props) {
+  const { colors, radii, shadow, type } = useTheme();
   const distance = formatDistance(item.distance_km);
   return (
     <Pressable
@@ -18,37 +24,56 @@ export function FacilityRow({ item, index, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel={`${item.name}, ${CATEGORY_LABELS[item.category]}, ${distance} away, ${item.postcode}`}
       accessibilityHint="Opens details and directions"
-      style={styles.row}
+      style={({ pressed }) => [
+        styles.card,
+        shadow,
+        {
+          backgroundColor: colors.surface,
+          borderRadius: radii.lg,
+          borderColor: selected ? colors.accent : 'transparent',
+        },
+        pressed && styles.pressed,
+      ]}
     >
+      {index !== undefined && (
+        <View style={[styles.index, { backgroundColor: colors.accent }]}>
+          <Text style={[type.label, { color: colors.onAccent, fontWeight: '600' }]}>{index}</Text>
+        </View>
+      )}
       <View style={styles.main}>
-        <Text style={styles.name}>
-          {index !== undefined ? `[${index}] ` : ''}
-          {item.name}
-        </Text>
-        <Text style={styles.address}>
+        <Text style={[type.body, styles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={[type.caption, { color: colors.textSecondary }]}>
           {item.address ? `${item.address}, ` : ''}
           {item.postcode}
         </Text>
-        <Text style={styles.board}>{item.health_board}</Text>
+        <View style={styles.board}>
+          <Badge tone="muted">{item.health_board}</Badge>
+        </View>
       </View>
-      <Text style={styles.distance}>{distance}</Text>
+      <Badge>{distance}</Badge>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  card: {
     minHeight: MIN_TARGET,
     flexDirection: 'row',
-    gap: spacing.md,
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    alignItems: 'flex-start',
+    gap: 12,
+    padding: 16,
+    borderWidth: 1.5,
+  },
+  pressed: { opacity: 0.7 },
+  index: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
   },
   main: { flex: 1, gap: 2 },
-  name: { fontSize: 17, fontWeight: '700', color: colors.text },
-  address: { fontSize: 14, color: colors.textMuted },
-  board: { fontSize: 13, color: colors.textMuted },
-  distance: { fontSize: 16, fontWeight: '700', color: colors.primary, alignSelf: 'center' },
+  name: { fontWeight: '600' },
+  board: { marginTop: 6 },
 });

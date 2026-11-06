@@ -1,7 +1,9 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { describeAge } from '../storage/cache';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
+import { GUTTER } from './ui';
 
 interface Props {
   savedAt: number;
@@ -9,15 +11,17 @@ interface Props {
 }
 
 export function CachedBadge({ savedAt, reason }: Props) {
+  const { colors, radii, type } = useTheme();
   const age = describeAge(savedAt);
   return (
     <View
-      style={styles.box}
+      style={[styles.box, { backgroundColor: colors.warningBg, borderRadius: radii.md }]}
       accessibilityRole="alert"
       accessibilityLabel={`Showing saved results from ${age}. ${reason ?? ''}`}
     >
-      <Text style={styles.badge}>cached</Text>
-      <Text style={styles.text}>
+      <Ionicons name="cloud-offline-outline" size={18} color={colors.warningText} />
+      <Text style={[type.label, styles.badge, { color: colors.warningText }]}>cached</Text>
+      <Text style={[type.caption, styles.text, { color: colors.warningText }]}>
         Saved {age}. {reason ?? 'You may be offline.'}
       </Text>
     </View>
@@ -28,19 +32,11 @@ const styles = StyleSheet.create({
   box: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.md,
-    backgroundColor: colors.warningBg,
+    gap: 8,
+    padding: 12,
+    marginHorizontal: GUTTER,
+    marginBottom: 12,
   },
-  badge: {
-    color: colors.onPrimary,
-    backgroundColor: colors.warningText,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontSize: 12,
-    fontWeight: '700',
-    overflow: 'hidden',
-  },
-  text: { flex: 1, color: colors.warningText, fontSize: 14 },
+  badge: { fontWeight: '700' },
+  text: { flex: 1 },
 });

@@ -37,9 +37,10 @@ describe('FacilityRow', () => {
     expect(onPress).toHaveBeenCalledWith(PHARMACY);
   });
 
-  it('shows the citation number in Ask results', async () => {
+  it('shows the citation number in a badge in Ask results', async () => {
     await render(<FacilityRow item={PHARMACY} index={2} onPress={jest.fn()} />);
-    expect(screen.getByText(/\[2\] Leith Pharmacy/)).toBeOnTheScreen();
+    expect(screen.getByText('2')).toBeOnTheScreen();
+    expect(screen.getByText('Leith Pharmacy')).toBeOnTheScreen();
   });
 });
 

@@ -1,7 +1,10 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { CATEGORIES, CATEGORY_LABELS, type Category } from '../api/types';
-import { colors, MIN_TARGET, spacing } from '../theme';
+import { MIN_TARGET, useTheme } from '../theme';
+import { CATEGORY_ICONS } from './categoryIcons';
+import { GUTTER } from './ui';
 
 interface Props {
   selected: Category;
@@ -9,6 +12,7 @@ interface Props {
 }
 
 export function CategoryChips({ selected, onSelect }: Props) {
+  const { colors, radii, type } = useTheme();
   return (
     <ScrollView
       horizontal
@@ -20,6 +24,7 @@ export function CategoryChips({ selected, onSelect }: Props) {
     >
       {CATEGORIES.map((category) => {
         const active = category === selected;
+        const fg = active ? colors.accent : colors.textSecondary;
         return (
           <Pressable
             key={category}
@@ -27,9 +32,17 @@ export function CategoryChips({ selected, onSelect }: Props) {
             accessibilityRole="tab"
             accessibilityLabel={CATEGORY_LABELS[category]}
             accessibilityState={{ selected: active }}
-            style={[styles.chip, active && styles.chipActive]}
+            style={({ pressed }) => [
+              styles.chip,
+              {
+                borderRadius: radii.pill,
+                backgroundColor: active ? colors.accentSoft : colors.surfaceMuted,
+              },
+              pressed && styles.pressed,
+            ]}
           >
-            <Text style={[styles.label, active && styles.labelActive]}>
+            <Ionicons name={CATEGORY_ICONS[category]} size={16} color={fg} />
+            <Text style={[type.body, { color: fg, fontWeight: active ? '600' : '400' }]}>
               {CATEGORY_LABELS[category]}
             </Text>
           </Pressable>
@@ -41,19 +54,15 @@ export function CategoryChips({ selected, onSelect }: Props) {
 
 const styles = StyleSheet.create({
   scroll: { flexGrow: 0, flexShrink: 0 },
-  row: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, gap: spacing.sm },
+  row: { paddingHorizontal: GUTTER, paddingVertical: 4, gap: 8 },
   chip: {
     minHeight: MIN_TARGET,
     minWidth: MIN_TARGET,
-    paddingHorizontal: spacing.lg,
-    borderRadius: MIN_TARGET / 2,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
   },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  label: { color: colors.text, fontSize: 16, fontWeight: '600' },
-  labelActive: { color: colors.onPrimary },
+  pressed: { opacity: 0.7 },
 });

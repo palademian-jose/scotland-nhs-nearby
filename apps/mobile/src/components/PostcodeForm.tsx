@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { colors, MIN_TARGET, spacing } from '../theme';
+import { MIN_TARGET, useTheme } from '../theme';
+import { Button, GUTTER } from './ui';
 
 interface Props {
   message?: string | null;
@@ -10,8 +11,10 @@ interface Props {
 
 /** Shown when location permission is denied: search from a typed postcode instead. */
 export function PostcodeForm({ message, onSubmit }: Props) {
+  const { colors, radii, type } = useTheme();
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
+  const unusable = busy || value.trim().length < 5;
 
   const submit = async () => {
     setBusy(true);
@@ -24,16 +27,17 @@ export function PostcodeForm({ message, onSubmit }: Props) {
 
   return (
     <View style={styles.box}>
-      <Text style={styles.title} accessibilityRole="header">
+      <Text style={[type.display, { color: colors.text }]} accessibilityRole="header">
         Where are you?
       </Text>
-      <Text style={styles.help}>
+      <Text style={[type.body, { color: colors.textSecondary }]}>
         {message ?? 'Enter a postcode to search from, or allow location access in Settings.'}
       </Text>
       <TextInput
         value={value}
         onChangeText={setValue}
         placeholder="EH8 9YL"
+        placeholderTextColor={colors.textSecondary}
         autoCapitalize="characters"
         autoCorrect={false}
         autoComplete="postal-code"
@@ -41,42 +45,29 @@ export function PostcodeForm({ message, onSubmit }: Props) {
         onSubmitEditing={submit}
         accessibilityLabel="Postcode"
         accessibilityHint="Enter a full UK postcode"
-        style={styles.input}
+        style={[
+          type.body,
+          styles.input,
+          {
+            color: colors.text,
+            backgroundColor: colors.surface,
+            borderColor: colors.borderStrong,
+            borderRadius: radii.lg,
+          },
+        ]}
       />
-      <Pressable
-        onPress={submit}
-        disabled={busy || value.trim().length < 5}
-        accessibilityRole="button"
+      <Button
+        label={busy ? 'Looking up...' : 'Use this postcode'}
         accessibilityLabel="Use this postcode"
-        accessibilityState={{ disabled: busy || value.trim().length < 5, busy }}
-        style={[styles.button, (busy || value.trim().length < 5) && styles.buttonDisabled]}
-      >
-        <Text style={styles.buttonText}>{busy ? 'Looking up...' : 'Use this postcode'}</Text>
-      </Pressable>
+        onPress={submit}
+        disabled={unusable}
+        busy={busy}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  box: { padding: spacing.lg, gap: spacing.md, backgroundColor: colors.surface },
-  title: { fontSize: 20, fontWeight: '700', color: colors.text },
-  help: { fontSize: 15, color: colors.textMuted },
-  input: {
-    minHeight: MIN_TARGET,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: spacing.md,
-    fontSize: 18,
-    color: colors.text,
-  },
-  button: {
-    minHeight: MIN_TARGET,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  box: { padding: GUTTER, paddingTop: 32, gap: 16 },
+  input: { minHeight: MIN_TARGET + 8, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 12 },
 });
