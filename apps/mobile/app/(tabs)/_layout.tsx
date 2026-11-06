@@ -35,14 +35,15 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.background },
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textTertiary,
-        tabBarLabelStyle: { fontSize: 11, lineHeight: 14, fontWeight: '500' },
+        tabBarItemStyle: { paddingVertical: 2 },
+        tabBarLabelStyle: { fontSize: 11, lineHeight: 13, fontWeight: '500', marginTop: 0 },
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: 52 + insets.bottom,
-          paddingTop: 4,
-          paddingBottom: insets.bottom + 4,
+          height: 56 + insets.bottom,
+          paddingTop: 0,
+          paddingBottom: insets.bottom,
         },
       }}
     >
