@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
 
-import { useTheme } from '../theme';
+import { radii, useTheme } from '../theme';
+import { groupRowStyle, type RowPosition, rowPosition } from './ui';
 
 const NATIVE = Platform.OS !== 'web';
 
 /** Placeholder card that pulses while results load. */
-export function SkeletonCard() {
-  const { colors, radii, shadow } = useTheme();
+export function SkeletonCard({ position = 'only' }: { position?: RowPosition }) {
+  const { colors } = useTheme();
   const [opacity] = useState(() => new Animated.Value(0.5));
 
   useEffect(() => {
@@ -25,17 +26,10 @@ export function SkeletonCard() {
 
   const bar = { backgroundColor: colors.surfaceMuted, borderRadius: radii.sm };
   return (
-    <Animated.View
-      style={[
-        styles.card,
-        { backgroundColor: colors.surface, borderRadius: radii.lg, opacity },
-        shadow,
-      ]}
-    >
+    <Animated.View style={[styles.card, groupRowStyle(position, colors), { opacity }]}>
       <View style={styles.lines}>
         <View style={[bar, styles.title]} />
         <View style={[bar, styles.address]} />
-        <View style={[bar, styles.tag]} />
       </View>
       <View style={[bar, styles.badge]} />
     </Animated.View>
@@ -84,20 +78,19 @@ export function SkeletonList({ count = 4 }: { count?: number }) {
   return (
     <View style={styles.list} accessibilityLabel="Loading results" accessibilityRole="progressbar">
       {Array.from({ length: count }, (_, i) => (
-        <SkeletonCard key={i} />
+        <SkeletonCard key={i} position={rowPosition(i, count)} />
       ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { gap: 12 },
-  card: { padding: 16, flexDirection: 'row', gap: 12, alignItems: 'center' },
+  list: {},
+  card: { padding: 12, flexDirection: 'row', gap: 12, alignItems: 'center' },
   lines: { flex: 1, gap: 8 },
-  title: { height: 16, width: '60%' },
-  address: { height: 12, width: '85%' },
-  tag: { height: 12, width: '30%' },
-  badge: { height: 24, width: 56 },
+  title: { height: 14, width: '60%' },
+  address: { height: 11, width: '85%' },
+  badge: { height: 14, width: 40 },
   dots: { flexDirection: 'row', gap: 6, paddingVertical: 8 },
   dotItem: { width: 8, height: 8, borderRadius: 4 },
 });

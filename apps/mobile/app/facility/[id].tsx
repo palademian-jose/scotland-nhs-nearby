@@ -14,10 +14,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CATEGORY_LABELS, type Facility, type NearbyResult } from '../../src/api/types';
 import { CATEGORY_ICONS } from '../../src/components/categoryIcons';
-import { Badge, Button, Card, GUTTER } from '../../src/components/ui';
+import { Button, Card, GUTTER } from '../../src/components/ui';
 import { directionsUrl, formatDistance, haversineKm } from '../../src/lib/geo';
 import { useApp } from '../../src/state/AppState';
-import { MIN_TARGET, useTheme } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 
 function parseItem(data: string | undefined): Facility | null {
   if (!data) {
@@ -34,10 +34,10 @@ function parseItem(data: string | undefined): Facility | null {
   return null;
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, first }: { label: string; value: string; first?: boolean }) {
   const { colors, type } = useTheme();
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, !first && { borderTopWidth: 1, borderTopColor: colors.border }]}>
       <Text style={[type.caption, styles.key, { color: colors.textSecondary }]}>{label}</Text>
       <Text style={[type.body, styles.value, { color: colors.text }]}>{value}</Text>
     </View>
@@ -48,7 +48,7 @@ export default function DetailsScreen() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, shadow, type } = useTheme();
+  const { colors, type } = useTheme();
   const { client, location } = useApp();
   const [item, setItem] = useState<Facility | null>(() => parseItem(params.data));
   const [error, setError] = useState<string | null>(null);
@@ -68,16 +68,20 @@ export default function DetailsScreen() {
   const backButton = (
     <Pressable
       onPress={goBack}
+      hitSlop={4}
       accessibilityRole="button"
       accessibilityLabel="Go back"
       style={({ pressed }) => [
         styles.back,
-        shadow,
-        { top: insets.top + 8, backgroundColor: colors.surface },
+        {
+          top: insets.top + 8,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
         pressed && styles.pressed,
       ]}
     >
-      <Ionicons name="chevron-back" size={22} color={colors.text} />
+      <Ionicons name="chevron-back" size={18} color={colors.text} />
     </Pressable>
   );
 
@@ -89,7 +93,7 @@ export default function DetailsScreen() {
             style={[
               type.body,
               styles.message,
-              { color: colors.danger, paddingTop: insets.top + 72 },
+              { color: colors.danger, paddingTop: insets.top + 56 },
             ]}
             accessibilityRole="alert"
           >
@@ -112,31 +116,34 @@ export default function DetailsScreen() {
     (location.coords ? haversineKm(location.coords, { lat: item.lat, lon: item.lon }) : null);
   const address = `${item.address ? `${item.address}, ` : ''}${item.postcode}`;
   const phone = item.phone;
+  const tags = [
+    CATEGORY_LABELS[item.category],
+    item.health_board,
+    ...(distance !== null ? [`${formatDistance(distance)} away`] : []),
+  ].join(' · ');
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 72 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 56 }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.heroIcon, { backgroundColor: colors.accentSoft }]}>
-          <Ionicons name={CATEGORY_ICONS[item.category]} size={30} color={colors.accent} />
+          <Ionicons name={CATEGORY_ICONS[item.category]} size={22} color={colors.accent} />
         </View>
-        <Text style={[type.display, { color: colors.text }]} accessibilityRole="header">
-          {item.name}
-        </Text>
-        <Text style={[type.body, { color: colors.textSecondary }]}>{address}</Text>
-        <View style={styles.chips}>
-          <Badge>{CATEGORY_LABELS[item.category]}</Badge>
-          <Badge tone="muted">{item.health_board}</Badge>
-          {distance !== null && <Badge>{`${formatDistance(distance)} away`}</Badge>}
+        <View style={styles.titleBlock}>
+          <Text style={[type.display, { color: colors.text }]} accessibilityRole="header">
+            {item.name}
+          </Text>
+          <Text style={[type.body, { color: colors.textSecondary }]}>{address}</Text>
+          <Text style={[type.caption, { color: colors.textSecondary }]}>{tags}</Text>
         </View>
 
         <View style={styles.actions}>
           <Button
             label="Directions"
             accessibilityLabel={`Get directions to ${item.name}`}
-            variant="soft"
+            variant="outline"
             icon="navigate"
             onPress={() => Linking.openURL(directionsUrl(item))}
             style={styles.action}
@@ -145,7 +152,7 @@ export default function DetailsScreen() {
             <Button
               label="Call"
               accessibilityLabel={`Call ${phone}`}
-              variant="soft"
+              variant="outline"
               icon="call"
               onPress={() => Linking.openURL(`tel:${phone.replace(/\s+/g, '')}`)}
               style={styles.action}
@@ -154,7 +161,7 @@ export default function DetailsScreen() {
         </View>
 
         <Card style={styles.meta}>
-          <Row label="Postcode" value={item.postcode} />
+          <Row first label="Postcode" value={item.postcode} />
           {phone && <Row label="Phone" value={phone} />}
           <Row label="Health board" value={item.health_board} />
           <Row label="Source dataset" value={item.source_dataset} />
@@ -172,30 +179,30 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   message: { padding: GUTTER },
-  content: { paddingHorizontal: GUTTER, paddingBottom: 40, gap: 12 },
+  content: { paddingHorizontal: GUTTER, paddingBottom: 24, gap: 12 },
   back: {
     position: 'absolute',
     left: GUTTER,
-    width: MIN_TARGET,
-    height: MIN_TARGET,
-    borderRadius: MIN_TARGET / 2,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   pressed: { opacity: 0.7 },
   heroIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
   },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
-  actions: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  titleBlock: { gap: 2 },
+  actions: { flexDirection: 'row', gap: 8 },
   action: { flex: 1 },
-  meta: { gap: 14, marginTop: 8 },
-  row: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
-  key: { width: 104, paddingTop: 2 },
+  meta: { padding: 0, paddingHorizontal: 12 },
+  row: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', paddingVertical: 10 },
+  key: { width: 100, paddingTop: 2 },
   value: { flex: 1 },
 });

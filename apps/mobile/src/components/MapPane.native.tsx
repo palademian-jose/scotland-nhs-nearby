@@ -21,7 +21,7 @@ export function MapPane({ center, items, onSelect, selectedId, onHighlight }: Ma
         showsUserLocation
       >
         {items.map((item) => {
-          const size = item.id === selectedId ? 30 : 22;
+          const size = item.id === selectedId ? 18 : 14;
           return (
             <Marker
               key={`${item.id}-${size}`}

@@ -19,7 +19,7 @@ function TabIcon({
   return (
     <Ionicons
       name={focused ? filled : outline}
-      size={24}
+      size={22}
       color={focused ? colors.accent : colors.textTertiary}
     />
   );
@@ -40,9 +40,9 @@ export default function TabsLayout() {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: 66 + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: insets.bottom + 6,
+          height: 52 + insets.bottom,
+          paddingTop: 4,
+          paddingBottom: insets.bottom + 4,
         },
       }}
     >

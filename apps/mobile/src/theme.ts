@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Platform, type TextStyle, useColorScheme, type ViewStyle } from 'react-native';
+import { Platform, type TextStyle, useColorScheme } from 'react-native';
 
 // Every text, icon and control pair below is checked against WCAG AA in __tests__/theme.test.ts.
 export interface Palette {
@@ -55,9 +55,12 @@ export const darkPalette: Palette = {
   warningText: '#FDE68A',
 };
 
-export const radii = { sm: 10, md: 14, lg: 20, pill: 999 } as const;
+export const radii = { sm: 4, md: 6, lg: 8 } as const;
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32 } as const;
+
+/** Page gutter, card padding and the gaps between cards and sections. */
+export const layout = { gutter: 16, cardPadding: 12, cardGap: 8, sectionGap: 12 } as const;
 
 // Minimum touch target on iOS and Android guidelines.
 export const MIN_TARGET = 44;
@@ -70,25 +73,16 @@ const fontFamily = Platform.select({
 export const typography = {
   display: {
     fontFamily,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 24,
+    lineHeight: 30,
     fontWeight: '600',
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
   },
-  title: { fontFamily, fontSize: 20, lineHeight: 26, fontWeight: '600' },
-  body: { fontFamily, fontSize: 16, lineHeight: 22, fontWeight: '400' },
-  caption: { fontFamily, fontSize: 13, lineHeight: 18, fontWeight: '400' },
+  title: { fontFamily, fontSize: 16, lineHeight: 21, fontWeight: '600' },
+  body: { fontFamily, fontSize: 15, lineHeight: 21, fontWeight: '400' },
+  caption: { fontFamily, fontSize: 13, lineHeight: 17, fontWeight: '400' },
   label: { fontFamily, fontSize: 12, lineHeight: 16, fontWeight: '500' },
 } as const satisfies Record<string, TextStyle>;
-
-/** The one soft elevation used for cards and floating controls. */
-export const cardShadow: ViewStyle = {
-  shadowColor: '#0F172A',
-  shadowOpacity: 0.06,
-  shadowRadius: 12,
-  shadowOffset: { width: 0, height: 4 },
-  elevation: 2,
-};
 
 export interface Theme {
   scheme: 'light' | 'dark';
@@ -96,7 +90,6 @@ export interface Theme {
   radii: typeof radii;
   spacing: typeof spacing;
   type: typeof typography;
-  shadow: ViewStyle;
 }
 
 export function useTheme(): Theme {
@@ -108,7 +101,6 @@ export function useTheme(): Theme {
       radii,
       spacing,
       type: typography,
-      shadow: cardShadow,
     }),
     [scheme],
   );

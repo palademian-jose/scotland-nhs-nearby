@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { describeAge } from '../storage/cache';
-import { useTheme } from '../theme';
+import { radii, useTheme } from '../theme';
 import { GUTTER } from './ui';
 
 interface Props {
@@ -11,11 +11,11 @@ interface Props {
 }
 
 export function CachedBadge({ savedAt, reason }: Props) {
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
   const age = describeAge(savedAt);
   return (
     <View
-      style={[styles.box, { backgroundColor: colors.warningBg, borderRadius: radii.md }]}
+      style={[styles.box, { backgroundColor: colors.warningBg, borderRadius: radii.lg }]}
       accessibilityRole="alert"
       accessibilityLabel={`Showing saved results from ${age}. ${reason ?? ''}`}
     >
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 12,
+    padding: 10,
     marginHorizontal: GUTTER,
     marginBottom: 12,
   },

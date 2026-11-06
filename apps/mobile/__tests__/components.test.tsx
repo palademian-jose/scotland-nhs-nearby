@@ -32,7 +32,7 @@ describe('FacilityRow', () => {
       name: 'Leith Pharmacy, Pharmacy, 400 m away, EH6 5AA',
     });
     expect(screen.getByText('400 m')).toBeOnTheScreen();
-    expect(screen.getByText('NHS Lothian')).toBeOnTheScreen();
+    expect(screen.getByText(/EH6 5AA · NHS Lothian/)).toBeOnTheScreen();
     await fireEvent.press(row);
     expect(onPress).toHaveBeenCalledWith(PHARMACY);
   });

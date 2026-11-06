@@ -121,7 +121,7 @@ describe('Ask screen', () => {
     await render(<AskScreen />);
     await fireEvent.changeText(screen.getByLabelText('Your question'), 'nearest pharmacy to Leith');
     await fireEvent.press(screen.getByRole('button', { name: 'Ask' }));
-    expect(await screen.findByText(ASK_OK.answer)).toBeOnTheScreen();
+    expect(await screen.findByText(ASK_OK.answer, { exact: false })).toBeOnTheScreen();
     expect(screen.getByLabelText(/^Leith Pharmacy, Pharmacy/)).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Source 1: Leith Pharmacy' })).toBeOnTheScreen();
     expect(screen.getByText(/Open Government Licence v3.0/)).toBeOnTheScreen();
@@ -164,7 +164,7 @@ describe('Ask screen', () => {
     useFetch(() => jsonResponse(ASK_OK));
     await render(<AskScreen />);
     expect(await screen.findByText('cached')).toBeOnTheScreen();
-    expect(screen.getByText(ASK_OK.answer)).toBeOnTheScreen();
+    expect(screen.getByText(ASK_OK.answer, { exact: false })).toBeOnTheScreen();
   });
 
   it('keeps the Ask button disabled for an empty question', async () => {

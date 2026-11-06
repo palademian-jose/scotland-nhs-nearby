@@ -16,11 +16,18 @@ import type { AskResponse, NearbyResult } from '../../src/api/types';
 import { CachedBadge } from '../../src/components/CachedBadge';
 import { FacilityRow } from '../../src/components/FacilityRow';
 import { ThinkingDots } from '../../src/components/Skeleton';
-import { Card, GUTTER, Screen, ScreenHeader } from '../../src/components/ui';
+import {
+  Card,
+  GUTTER,
+  rowPosition,
+  Screen,
+  ScreenHeader,
+  useFocusBorder,
+} from '../../src/components/ui';
 import { STORAGE_KEYS } from '../../src/config';
 import { useApp } from '../../src/state/AppState';
 import { loadCache, saveCache } from '../../src/storage/cache';
-import { MIN_TARGET, useTheme } from '../../src/theme';
+import { radii, useTheme } from '../../src/theme';
 
 const EXAMPLES = [
   'nearest pharmacy to EH8 9YL',
@@ -30,7 +37,8 @@ const EXAMPLES = [
 
 export default function AskScreen() {
   const router = useRouter();
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
+  const focus = useFocusBorder();
   const { client, location } = useApp();
   const [question, setQuestion] = useState('');
   const [busy, setBusy] = useState(false);
@@ -95,16 +103,14 @@ export default function AskScreen() {
           <View
             style={[
               styles.inputCard,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.borderStrong,
-                borderRadius: radii.lg,
-              },
+              { backgroundColor: colors.surface, borderColor: focus.borderColor },
             ]}
           >
             <TextInput
               value={question}
               onChangeText={setQuestion}
+              onFocus={focus.onFocus}
+              onBlur={focus.onBlur}
               placeholder="e.g. nearest pharmacy to EH8 9YL"
               placeholderTextColor={colors.textSecondary}
               multiline
@@ -115,23 +121,22 @@ export default function AskScreen() {
               accessibilityHint="Type where you are and what you need"
               style={[type.body, styles.input, { color: colors.text }]}
             />
-            <View style={styles.sendRow}>
-              <Pressable
-                onPress={() => submit()}
-                disabled={cannotSend}
-                accessibilityRole="button"
-                accessibilityLabel="Ask"
-                accessibilityState={{ disabled: cannotSend, busy }}
-                style={({ pressed }) => [
-                  styles.send,
-                  { backgroundColor: colors.accent },
-                  cannotSend && styles.disabled,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Ionicons name="arrow-up" size={22} color={colors.onAccent} />
-              </Pressable>
-            </View>
+            <Pressable
+              onPress={() => submit()}
+              disabled={cannotSend}
+              hitSlop={4}
+              accessibilityRole="button"
+              accessibilityLabel="Ask"
+              accessibilityState={{ disabled: cannotSend, busy }}
+              style={({ pressed }) => [
+                styles.send,
+                { backgroundColor: colors.accent },
+                cannotSend && styles.disabled,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Ionicons name="arrow-up" size={18} color={colors.onAccent} />
+            </Pressable>
           </View>
 
           <ScrollView
@@ -144,15 +149,18 @@ export default function AskScreen() {
               <Pressable
                 key={example}
                 onPress={() => submit(example)}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel={`Try: ${example}`}
                 style={({ pressed }) => [
                   styles.suggestion,
-                  { backgroundColor: colors.surfaceMuted, borderRadius: radii.pill },
+                  { borderColor: colors.border },
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[type.body, { color: colors.textSecondary }]}>{example}</Text>
+                <Text style={[type.body, { fontSize: 14, color: colors.textSecondary }]}>
+                  {example}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -188,46 +196,41 @@ export default function AskScreen() {
                   ]}
                   accessibilityLiveRegion="polite"
                 >
-                  <Ionicons name="information-circle" size={22} color={colors.warningText} />
+                  <Ionicons name="information-circle" size={20} color={colors.warningText} />
                   <Text style={[type.body, styles.flex, { color: colors.warningText }]}>
                     {result.answer}
                   </Text>
                 </View>
               ) : (
                 <Card style={styles.answer}>
-                  <View accessibilityLiveRegion="polite" style={styles.answerBody}>
-                    <Text style={[type.body, { color: colors.text }]}>{result.answer}</Text>
-                    {result.resolved_via === 'postcode_district' && (
-                      <Text style={[type.caption, { color: colors.textSecondary }]}>
-                        That postcode is not in the offline data, so the search started from the
-                        middle of its postcode district.
-                      </Text>
-                    )}
-                  </View>
-                  {result.citations.length > 0 && (
-                    <View style={styles.citations}>
-                      {result.citations.map((citation) => {
-                        const target = result.results.find((r) => r.id === citation.id);
-                        return (
-                          <Pressable
-                            key={citation.index}
-                            onPress={() => target && open(target)}
-                            hitSlop={8}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Source ${citation.index}: ${citation.name}`}
-                            style={({ pressed }) => [
-                              styles.citation,
-                              { backgroundColor: colors.accentSoft },
-                              pressed && styles.pressed,
-                            ]}
-                          >
-                            <Text style={[type.label, { color: colors.accent, fontWeight: '600' }]}>
-                              {citation.index}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
+                  <Text
+                    style={[type.body, { color: colors.text }]}
+                    accessibilityLiveRegion="polite"
+                  >
+                    {result.answer}
+                    {result.citations.map((citation) => {
+                      const target = result.results.find((r) => r.id === citation.id);
+                      return (
+                        <Text
+                          key={citation.index}
+                          onPress={() => target && open(target)}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Source ${citation.index}: ${citation.name}`}
+                          style={[
+                            type.label,
+                            { color: colors.accent, backgroundColor: colors.accentSoft },
+                          ]}
+                        >
+                          {` ${citation.index} `}
+                        </Text>
+                      );
+                    })}
+                  </Text>
+                  {result.resolved_via === 'postcode_district' && (
+                    <Text style={[type.caption, { color: colors.textSecondary }]}>
+                      That postcode is not in the offline data, so the search started from the
+                      middle of its postcode district.
+                    </Text>
                   )}
                   {result.results.length > 0 && (
                     <Text style={[type.caption, { color: colors.textTertiary }]}>
@@ -236,9 +239,17 @@ export default function AskScreen() {
                   )}
                 </Card>
               )}
-              {result.results.map((item, index) => (
-                <FacilityRow key={item.id} item={item} index={index + 1} onPress={open} />
-              ))}
+              <View>
+                {result.results.map((item, index) => (
+                  <FacilityRow
+                    key={item.id}
+                    item={item}
+                    index={index + 1}
+                    position={rowPosition(index, result.results.length)}
+                    onPress={open}
+                  />
+                ))}
+              </View>
             </View>
           )}
         </ScrollView>
@@ -249,34 +260,39 @@ export default function AskScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  content: { paddingBottom: 32 },
-  inputCard: { marginHorizontal: GUTTER, padding: 14, borderWidth: 1 },
-  input: { minHeight: 56, textAlignVertical: 'top', padding: 0 },
-  sendRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 },
+  content: { paddingBottom: 16 },
+  inputCard: {
+    marginHorizontal: GUTTER,
+    minHeight: 88,
+    padding: 12,
+    paddingBottom: 48,
+    borderWidth: 1,
+    borderRadius: radii.lg,
+  },
+  input: { minHeight: 28, textAlignVertical: 'top', padding: 0 },
   send: {
-    width: MIN_TARGET,
-    height: MIN_TARGET,
-    borderRadius: MIN_TARGET / 2,
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   disabled: { opacity: 0.4 },
   pressed: { opacity: 0.7 },
   suggestionScroll: { flexGrow: 0, marginTop: 12 },
-  suggestions: { paddingHorizontal: GUTTER, gap: 8 },
-  suggestion: { minHeight: MIN_TARGET, justifyContent: 'center', paddingHorizontal: 16 },
-  results: { paddingHorizontal: GUTTER, gap: 12, marginTop: 16 },
-  cachedWrap: { marginTop: 16 },
-  refusal: { flexDirection: 'row', gap: 12, padding: 16, alignItems: 'flex-start' },
-  answer: { gap: 12 },
-  answerBody: { gap: 8 },
-  citations: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  citation: {
-    minWidth: 28,
-    height: 28,
-    borderRadius: 14,
-    paddingHorizontal: 8,
-    alignItems: 'center',
+  suggestions: { paddingHorizontal: GUTTER, gap: 6 },
+  suggestion: {
+    height: 32,
     justifyContent: 'center',
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: radii.md,
   },
+  results: { paddingHorizontal: GUTTER, gap: 8, marginTop: 12 },
+  cachedWrap: { marginTop: 12 },
+  refusal: { flexDirection: 'row', gap: 10, padding: 12, alignItems: 'flex-start' },
+  answer: { gap: 8 },
 });

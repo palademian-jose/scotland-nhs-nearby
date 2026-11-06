@@ -13,10 +13,10 @@ import { SHEET_HEIGHT_PERCENT } from '../../src/components/mapLayout';
 import { PostcodeForm } from '../../src/components/PostcodeForm';
 import { SegmentedControl } from '../../src/components/SegmentedControl';
 import { SkeletonList } from '../../src/components/Skeleton';
-import { EmptyState, GUTTER, Screen, ScreenHeader } from '../../src/components/ui';
+import { EmptyState, GUTTER, rowPosition, Screen, ScreenHeader } from '../../src/components/ui';
 import { useNearby } from '../../src/hooks/useNearby';
 import { useApp } from '../../src/state/AppState';
-import { MIN_TARGET, useTheme } from '../../src/theme';
+import { radii, useTheme } from '../../src/theme';
 
 type ViewMode = 'list' | 'map';
 
@@ -27,7 +27,7 @@ const VIEW_OPTIONS = [
 
 export default function NearbyScreen() {
   const router = useRouter();
-  const { colors, radii, shadow, type } = useTheme();
+  const { colors, type } = useTheme();
   const insets = useSafeAreaInsets();
   const { client, location, setManualPostcode, retryGps } = useApp();
   const [category, setCategory] = useState<Category>('pharmacy');
@@ -83,12 +83,11 @@ export default function NearbyScreen() {
         accessibilityHint={`Searching from ${location.label}`}
         style={({ pressed }) => [
           styles.pill,
-          shadow,
-          { backgroundColor: colors.surface, borderRadius: radii.pill },
+          { backgroundColor: colors.surface, borderColor: colors.border },
           pressed && styles.pressed,
         ]}
       >
-        <Ionicons name="location" size={18} color={colors.accent} />
+        <Ionicons name="location" size={16} color={colors.accent} />
         <Text style={[type.body, styles.pillText, { color: colors.text }]} numberOfLines={1}>
           {placeName}
         </Text>
@@ -99,7 +98,7 @@ export default function NearbyScreen() {
           </View>
         )}
         <View style={styles.flex} />
-        <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+        <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
       </Pressable>
       {location.status === 'manual' && (
         <Pressable
@@ -108,12 +107,11 @@ export default function NearbyScreen() {
           accessibilityLabel="Use my current location"
           style={({ pressed }) => [
             styles.gps,
-            shadow,
-            { backgroundColor: colors.surface },
+            { backgroundColor: colors.surface, borderColor: colors.border },
             pressed && styles.pressed,
           ]}
         >
-          <Ionicons name="navigate" size={20} color={colors.accent} />
+          <Ionicons name="navigate" size={16} color={colors.accent} />
         </Pressable>
       )}
     </View>
@@ -173,9 +171,9 @@ export default function NearbyScreen() {
         <View
           style={[
             styles.sheet,
-            shadow,
             {
               backgroundColor: colors.background,
+              borderColor: colors.border,
               borderTopLeftRadius: radii.lg,
               borderTopRightRadius: radii.lg,
               height: `${SHEET_HEIGHT_PERCENT}%`,
@@ -186,10 +184,14 @@ export default function NearbyScreen() {
           <FlatList
             data={items}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <FacilityRow item={item} selected={item.id === highlighted} onPress={open} />
+            renderItem={({ item, index }) => (
+              <FacilityRow
+                item={item}
+                selected={item.id === highlighted}
+                position={rowPosition(index, items.length)}
+                onPress={open}
+              />
             )}
-            ItemSeparatorComponent={Gap}
             ListEmptyComponent={empty}
             contentContainerStyle={styles.sheetList}
             accessibilityLabel="Nearest services, closest first"
@@ -204,12 +206,11 @@ export default function NearbyScreen() {
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <View style={styles.gutter}>
-            <FacilityRow item={item} onPress={open} />
+            <FacilityRow item={item} position={rowPosition(index, items.length)} onPress={open} />
           </View>
         )}
-        ItemSeparatorComponent={Gap}
         ListHeaderComponent={
           <>
             <ScreenHeader title="Nearby" subtitle="The closest NHS services, nearest first" />
@@ -226,47 +227,51 @@ export default function NearbyScreen() {
   );
 }
 
-function Gap() {
-  return <View style={styles.gap} />;
-}
-
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   gutter: { paddingHorizontal: GUTTER },
-  list: { paddingBottom: 24 },
-  gap: { height: 12 },
+  list: { paddingBottom: 16 },
   pillRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: GUTTER,
-    paddingTop: 8,
     paddingBottom: 12,
   },
   pill: {
     flex: 1,
-    minHeight: MIN_TARGET + 4,
+    height: 40,
+    borderWidth: 1,
+    borderRadius: radii.lg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   pillText: { flexShrink: 1, fontWeight: '500' },
   approx: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   flex: { flex: 1 },
   dot: { width: 6, height: 6, borderRadius: 3 },
   gps: {
-    width: MIN_TARGET + 4,
-    height: MIN_TARGET + 4,
-    borderRadius: (MIN_TARGET + 4) / 2,
+    width: 40,
+    height: 40,
+    borderWidth: 1,
+    borderRadius: radii.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  segment: { paddingHorizontal: GUTTER, paddingTop: 8, paddingBottom: 16 },
+  segment: { paddingHorizontal: GUTTER, paddingTop: 12, paddingBottom: 12 },
   error: { paddingHorizontal: GUTTER, paddingBottom: 12 },
   pressed: { opacity: 0.7 },
   floating: { position: 'absolute', top: 0, left: 0, right: 0 },
-  sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, overflow: 'hidden' },
-  handle: { width: 36, height: 4, borderRadius: 2, alignSelf: 'center', marginVertical: 10 },
-  sheetList: { paddingHorizontal: GUTTER, paddingBottom: 16 },
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+    borderTopWidth: 1,
+  },
+  handle: { width: 32, height: 3, borderRadius: 2, alignSelf: 'center', marginVertical: 8 },
+  sheetList: { paddingHorizontal: GUTTER, paddingBottom: 12 },
 });

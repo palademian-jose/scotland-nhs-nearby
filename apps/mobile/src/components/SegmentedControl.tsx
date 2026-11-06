@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { MIN_TARGET, useTheme } from '../theme';
+import { radii, useTheme } from '../theme';
 
 interface Option<T extends string> {
   value: T;
@@ -14,12 +14,12 @@ interface Props<T extends string> {
   onChange: (value: T) => void;
 }
 
-/** Soft toggle with two or more options, for example List | Map. */
+/** Soft toggle with two or more options, for example List | Map. 32px tall. */
 export function SegmentedControl<T extends string>({ options, value, onChange }: Props<T>) {
-  const { colors, radii, shadow, type } = useTheme();
+  const { colors, type } = useTheme();
   return (
     <View
-      style={[styles.track, { backgroundColor: colors.surfaceMuted, borderRadius: radii.pill }]}
+      style={[styles.track, { backgroundColor: colors.surfaceMuted }]}
       accessibilityRole="tablist"
     >
       {options.map((option) => {
@@ -28,13 +28,16 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
           <Pressable
             key={option.value}
             onPress={() => onChange(option.value)}
+            hitSlop={{ top: 6, bottom: 6 }}
             accessibilityRole="tab"
             accessibilityLabel={option.accessibilityLabel}
             accessibilityState={{ selected: active }}
             style={({ pressed }) => [
               styles.option,
-              { borderRadius: radii.pill },
-              active && [{ backgroundColor: colors.surface }, shadow],
+              {
+                backgroundColor: active ? colors.surface : 'transparent',
+                borderColor: active ? colors.border : 'transparent',
+              },
               pressed && styles.pressed,
             ]}
           >
@@ -42,6 +45,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
               style={[
                 type.body,
                 {
+                  fontSize: 14,
                   color: active ? colors.text : colors.textSecondary,
                   fontWeight: active ? '600' : '400',
                 },
@@ -57,11 +61,13 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
 }
 
 const styles = StyleSheet.create({
-  track: { flexDirection: 'row', padding: 4, alignSelf: 'flex-start' },
+  track: { flexDirection: 'row', padding: 2, alignSelf: 'flex-start', borderRadius: radii.lg },
   option: {
-    minHeight: MIN_TARGET,
-    minWidth: 76,
-    paddingHorizontal: 16,
+    height: 28,
+    minWidth: 64,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: radii.md,
     alignItems: 'center',
     justifyContent: 'center',
   },

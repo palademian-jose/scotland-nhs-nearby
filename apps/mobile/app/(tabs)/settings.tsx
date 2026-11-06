@@ -3,10 +3,17 @@ import * as Location from 'expo-location';
 import { type ReactNode, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Button, Card, GUTTER, Screen, ScreenHeader } from '../../src/components/ui';
+import {
+  Button,
+  Card,
+  GUTTER,
+  Screen,
+  ScreenHeader,
+  useFocusBorder,
+} from '../../src/components/ui';
 import { STORAGE_KEYS } from '../../src/config';
 import { useApp } from '../../src/state/AppState';
-import { MIN_TARGET, useTheme } from '../../src/theme';
+import { radii, useTheme } from '../../src/theme';
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   const { colors, type } = useTheme();
@@ -19,7 +26,8 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function SettingsScreen() {
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
+  const focus = useFocusBorder();
   const { apiUrl, setApiUrl, location, retryGps } = useApp();
   const [edited, setDraft] = useState<string | null>(null);
   const draft = edited ?? apiUrl;
@@ -71,14 +79,16 @@ export default function SettingsScreen() {
             autoCorrect={false}
             keyboardType="url"
             accessibilityLabel="API address"
+            onFocus={focus.onFocus}
+            onBlur={focus.onBlur}
             style={[
               type.body,
               styles.input,
               {
                 color: colors.text,
                 backgroundColor: colors.surface,
-                borderColor: colors.borderStrong,
-                borderRadius: radii.md,
+                borderColor: focus.borderColor,
+                borderRadius: radii.lg,
               },
             ]}
           />
@@ -98,7 +108,7 @@ export default function SettingsScreen() {
           <Button
             label="Use my current location"
             accessibilityLabel="Request location permission again"
-            variant="soft"
+            variant="outline"
             icon="navigate"
             onPress={retryGps}
           />
@@ -107,7 +117,7 @@ export default function SettingsScreen() {
         <Group title="Saved data">
           <Button
             label="Clear saved results"
-            variant="soft"
+            variant="outline"
             icon="trash-outline"
             onPress={clearCache}
           />
@@ -142,11 +152,11 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  content: { paddingBottom: 32 },
-  group: { paddingHorizontal: GUTTER, marginBottom: 20, gap: 8 },
+  content: { paddingBottom: 16 },
+  group: { paddingHorizontal: GUTTER, marginBottom: 12, gap: 6 },
   groupTitle: { paddingHorizontal: 4 },
-  card: { gap: 12 },
-  input: { minHeight: MIN_TARGET + 4, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 10 },
+  card: { gap: 10 },
+  input: { minHeight: 40, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   dot: { width: 10, height: 10, borderRadius: 5 },
 });

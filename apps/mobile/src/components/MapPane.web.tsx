@@ -12,13 +12,13 @@ import type { MapPaneProps } from './MapPane';
 
 // Marker images do not survive bundling, so draw the pins with CSS instead.
 function makePin(accent: string, centre: string, selected: boolean): L.DivIcon {
-  const size = selected ? 32 : 22;
+  const size = selected ? 18 : 14;
   const dot = Math.round(size / 3);
   return L.divIcon({
     className: '',
     html:
       `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${accent};` +
-      'border:2px solid #fff;box-shadow:0 2px 6px rgba(15,23,42,.3);display:flex;' +
+      'border:2px solid #fff;box-shadow:0 0 0 1px rgba(15,23,42,.25);display:flex;' +
       `align-items:center;justify-content:center"><div style="width:${dot}px;height:${dot}px;` +
       `border-radius:50%;background:${centre}"></div></div>`,
     iconSize: [size, size],
@@ -28,12 +28,12 @@ function makePin(accent: string, centre: string, selected: boolean): L.DivIcon {
 
 // Minimal restyle of the stock Leaflet controls. The attribution stays visible.
 const MAP_CSS = `
-.nhs-map .leaflet-control-zoom { border: none; box-shadow: 0 4px 12px rgba(15,23,42,.12); border-radius: 14px; overflow: hidden; }
-.nhs-map .leaflet-control-zoom a { border: none; width: 40px; height: 40px; line-height: 40px; color: #0F172A; }
-.nhs-map .leaflet-control-attribution { border-radius: 10px 0 0 0; padding: 2px 8px; font-size: 11px; }
+.nhs-map .leaflet-control-zoom { border: 1px solid #E2E8F0; box-shadow: none; border-radius: 6px; overflow: hidden; }
+.nhs-map .leaflet-control-zoom a { border: none; width: 32px; height: 32px; line-height: 32px; color: #0F172A; }
+.nhs-map .leaflet-control-attribution { border-radius: 6px 0 0 0; padding: 2px 8px; font-size: 11px; }
 .nhs-map .leaflet-bottom { bottom: ${SHEET_HEIGHT_PERCENT}%; margin-bottom: 12px; }
-.nhs-map .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 4px 12px rgba(15,23,42,.18); }
-.nhs-map .leaflet-popup-content { margin: 12px 16px; font-family: inherit; }
+.nhs-map .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: none; border: 1px solid #E2E8F0; }
+.nhs-map .leaflet-popup-content { margin: 10px 12px; font-family: inherit; }
 `;
 
 function Recenter({ lat, lon }: { lat: number; lon: number }) {

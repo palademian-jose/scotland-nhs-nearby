@@ -1,14 +1,18 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Pressable, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { MIN_TARGET, useTheme } from '../theme';
+import { layout, type Palette, radii, useTheme } from '../theme';
 
 export type IconName = keyof typeof Ionicons.glyphMap;
 
 /** Horizontal page gutter used by every screen. */
-export const GUTTER = 20;
+export const GUTTER = layout.gutter;
+
+/** Height of small controls (buttons, chips). A hit slop lifts their touch target to 44. */
+export const CONTROL_HEIGHT = 36;
+export const SLOP_Y = 4;
 
 interface ScreenProps {
   children: ReactNode;
@@ -50,13 +54,19 @@ interface CardProps {
   style?: StyleProp<ViewStyle>;
 }
 
+/** Flat surface with a 1px outline. */
 export function Card({ children, style }: CardProps) {
-  const { colors, radii, shadow } = useTheme();
+  const { colors } = useTheme();
   return (
     <View
       style={[
-        { backgroundColor: colors.surface, borderRadius: radii.lg, padding: 16 },
-        shadow,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          borderWidth: 1,
+          borderRadius: radii.lg,
+          padding: layout.cardPadding,
+        },
         style,
       ]}
     >
@@ -65,18 +75,54 @@ export function Card({ children, style }: CardProps) {
   );
 }
 
+export type RowPosition = 'only' | 'first' | 'middle' | 'last';
+
+export function rowPosition(index: number, count: number): RowPosition {
+  if (count <= 1) {
+    return 'only';
+  }
+  return index === 0 ? 'first' : index === count - 1 ? 'last' : 'middle';
+}
+
+/** Style for one row of a grouped list: one outlined surface split by 1px hairlines. */
+export function groupRowStyle(position: RowPosition, colors: Palette): ViewStyle {
+  const top = position === 'only' || position === 'first';
+  const bottom = position === 'only' || position === 'last';
+  return {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderTopWidth: top ? 1 : 0,
+    borderTopLeftRadius: top ? radii.lg : 0,
+    borderTopRightRadius: top ? radii.lg : 0,
+    borderBottomLeftRadius: bottom ? radii.lg : 0,
+    borderBottomRightRadius: bottom ? radii.lg : 0,
+  };
+}
+
+/** Border colour for an input: the quiet outline, or the strong one while focused. */
+export function useFocusBorder() {
+  const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
+  return {
+    borderColor: focused ? colors.borderStrong : colors.border,
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  };
+}
+
 interface ButtonProps {
   label: string;
   onPress: () => void;
   accessibilityLabel?: string;
   icon?: IconName;
-  variant?: 'primary' | 'soft';
+  variant?: 'primary' | 'outline';
   disabled?: boolean;
   busy?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-/** Pill button. "primary" is a solid accent fill, "soft" is a quiet tinted fill. */
+/** 36px button. "primary" is a solid accent fill, "outline" a 1px outline with accent text. */
 export function Button({
   label,
   onPress,
@@ -87,64 +133,31 @@ export function Button({
   busy = false,
   style,
 }: ButtonProps) {
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
   const primary = variant === 'primary';
   const fg = primary ? colors.onAccent : colors.accent;
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      hitSlop={{ top: SLOP_Y, bottom: SLOP_Y }}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled, busy }}
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: primary ? colors.accent : colors.accentSoft,
-          borderRadius: radii.pill,
+          backgroundColor: primary ? colors.accent : 'transparent',
+          borderColor: primary ? colors.accent : colors.border,
         },
         disabled && styles.disabled,
         pressed && styles.pressed,
         style,
       ]}
     >
-      {icon ? <Ionicons name={icon} size={18} color={fg} /> : null}
+      {icon ? <Ionicons name={icon} size={16} color={fg} /> : null}
       <Text style={[type.body, { color: fg, fontWeight: '600' }]}>{label}</Text>
     </Pressable>
-  );
-}
-
-interface BadgeProps {
-  children: string;
-  tone?: 'accent' | 'muted';
-}
-
-/** Small rounded label: the distance badge ("accent") or the health board tag ("muted"). */
-export function Badge({ children, tone = 'accent' }: BadgeProps) {
-  const { colors, radii, type } = useTheme();
-  const accent = tone === 'accent';
-  return (
-    <View
-      style={[
-        styles.badge,
-        {
-          backgroundColor: accent ? colors.accentSoft : colors.surfaceMuted,
-          borderRadius: radii.pill,
-        },
-      ]}
-    >
-      <Text
-        style={[
-          type.label,
-          {
-            color: accent ? colors.accent : colors.textSecondary,
-            fontWeight: accent ? '600' : '500',
-          },
-        ]}
-      >
-        {children}
-      </Text>
-    </View>
   );
 }
 
@@ -160,35 +173,35 @@ export function EmptyState({ icon, message, actionLabel, onAction }: EmptyStateP
   return (
     <View style={styles.empty}>
       <View style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}>
-        <Ionicons name={icon} size={28} color={colors.accent} />
+        <Ionicons name={icon} size={22} color={colors.accent} />
       </View>
       <Text style={[type.body, styles.emptyText, { color: colors.textSecondary }]}>{message}</Text>
       {actionLabel && onAction ? (
-        <Button label={actionLabel} variant="soft" onPress={onAction} />
+        <Button label={actionLabel} variant="outline" onPress={onAction} />
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: GUTTER, paddingTop: 8, paddingBottom: 16, gap: 4 },
+  header: { paddingHorizontal: GUTTER, paddingTop: 8, paddingBottom: 12, gap: 2 },
   button: {
-    minHeight: MIN_TARGET,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    height: CONTROL_HEIGHT,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: radii.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 6,
   },
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.7 },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start' },
-  empty: { alignItems: 'center', gap: 12, padding: 32 },
+  empty: { alignItems: 'center', gap: 12, padding: 24 },
   emptyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },

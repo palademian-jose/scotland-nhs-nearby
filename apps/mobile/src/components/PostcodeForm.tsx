@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { MIN_TARGET, useTheme } from '../theme';
-import { Button, GUTTER } from './ui';
+import { radii, useTheme } from '../theme';
+import { Button, GUTTER, useFocusBorder } from './ui';
 
 interface Props {
   message?: string | null;
@@ -11,7 +11,8 @@ interface Props {
 
 /** Shown when location permission is denied: search from a typed postcode instead. */
 export function PostcodeForm({ message, onSubmit }: Props) {
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
+  const focus = useFocusBorder();
   const [value, setValue] = useState('');
   const [busy, setBusy] = useState(false);
   const unusable = busy || value.trim().length < 5;
@@ -45,13 +46,15 @@ export function PostcodeForm({ message, onSubmit }: Props) {
         onSubmitEditing={submit}
         accessibilityLabel="Postcode"
         accessibilityHint="Enter a full UK postcode"
+        onFocus={focus.onFocus}
+        onBlur={focus.onBlur}
         style={[
           type.body,
           styles.input,
           {
             color: colors.text,
             backgroundColor: colors.surface,
-            borderColor: colors.borderStrong,
+            borderColor: focus.borderColor,
             borderRadius: radii.lg,
           },
         ]}
@@ -68,6 +71,6 @@ export function PostcodeForm({ message, onSubmit }: Props) {
 }
 
 const styles = StyleSheet.create({
-  box: { padding: GUTTER, paddingTop: 32, gap: 16 },
-  input: { minHeight: MIN_TARGET + 8, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 12 },
+  box: { padding: GUTTER, paddingTop: 24, gap: 12 },
+  input: { minHeight: 44, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10 },
 });

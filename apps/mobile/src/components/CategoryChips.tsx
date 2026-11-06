@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { CATEGORIES, CATEGORY_LABELS, type Category } from '../api/types';
-import { MIN_TARGET, useTheme } from '../theme';
+import { radii, useTheme } from '../theme';
 import { CATEGORY_ICONS } from './categoryIcons';
 import { GUTTER } from './ui';
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function CategoryChips({ selected, onSelect }: Props) {
-  const { colors, radii, type } = useTheme();
+  const { colors, type } = useTheme();
   return (
     <ScrollView
       horizontal
@@ -29,20 +29,23 @@ export function CategoryChips({ selected, onSelect }: Props) {
           <Pressable
             key={category}
             onPress={() => onSelect(category)}
+            hitSlop={6}
             accessibilityRole="tab"
             accessibilityLabel={CATEGORY_LABELS[category]}
             accessibilityState={{ selected: active }}
             style={({ pressed }) => [
               styles.chip,
               {
-                borderRadius: radii.pill,
-                backgroundColor: active ? colors.accentSoft : colors.surfaceMuted,
+                backgroundColor: active ? colors.accentSoft : 'transparent',
+                borderColor: active ? 'transparent' : colors.border,
               },
               pressed && styles.pressed,
             ]}
           >
-            <Ionicons name={CATEGORY_ICONS[category]} size={16} color={fg} />
-            <Text style={[type.body, { color: fg, fontWeight: active ? '600' : '400' }]}>
+            <Ionicons name={CATEGORY_ICONS[category]} size={14} color={fg} />
+            <Text
+              style={[type.body, { fontSize: 14, color: fg, fontWeight: active ? '600' : '400' }]}
+            >
               {CATEGORY_LABELS[category]}
             </Text>
           </Pressable>
@@ -54,11 +57,12 @@ export function CategoryChips({ selected, onSelect }: Props) {
 
 const styles = StyleSheet.create({
   scroll: { flexGrow: 0, flexShrink: 0 },
-  row: { paddingHorizontal: GUTTER, paddingVertical: 4, gap: 8 },
+  row: { paddingHorizontal: GUTTER, gap: 6 },
   chip: {
-    minHeight: MIN_TARGET,
-    minWidth: MIN_TARGET,
-    paddingHorizontal: 16,
+    height: 32,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: radii.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
