@@ -1,0 +1,30 @@
+{
+  "parsed_rows": {
+    "ae": 30,
+    "dentist": 989,
+    "gp": 879,
+    "hospital": 244,
+    "pharmacy": 1343
+  },
+  "loaded_rows": {
+    "ae": 30,
+    "dentist": 976,
+    "gp": 876,
+    "hospital": 236,
+    "pharmacy": 1324
+  },
+  "dropped_no_coordinates_or_not_scottish": {
+    "dentist": 13,
+    "gp": 3,
+    "hospital": 8,
+    "pharmacy": 19
+  },
+  "sample_rows": {
+    "ae": 30,
+    "dentist": 50,
+    "gp": 55,
+    "hospital": 40,
+    "pharmacy": 55
+  },
+  "unique_postcodes": 2764
+}
