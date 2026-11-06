@@ -32,7 +32,8 @@ export function useNearby(
   const [settled, setSettled] = useState<Settled | null>(null);
   const lat = coords?.lat;
   const lon = coords?.lon;
-  const key = lat === undefined || lon === undefined ? null : `${client.baseUrl}|${category}|${lat}|${lon}`;
+  const key =
+    lat === undefined || lon === undefined ? null : `${client.baseUrl}|${category}|${lat}|${lon}`;
 
   useEffect(() => {
     if (lat === undefined || lon === undefined || key === null) {

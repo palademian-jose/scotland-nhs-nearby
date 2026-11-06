@@ -1,0 +1,11 @@
+# Location permission denied: the app must offer a postcode instead of a dead end.
+appId: dev.palademian.nhsnearby
+---
+- launchApp:
+    clearState: true
+    permissions: { location: deny }
+- assertVisible: "Where are you?"
+- tapOn: "Postcode"
+- inputText: "EH8 9YL"
+- tapOn: "Use this postcode"
+- assertVisible: "From: EH8 9YL.*"

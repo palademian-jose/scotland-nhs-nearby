@@ -1,0 +1,16 @@
+# Run on a device or emulator with the API reachable (see README, "Mobile on a device").
+#   maestro test apps/mobile/.maestro/nearby.yaml
+appId: dev.palademian.nhsnearby
+---
+- launchApp:
+    clearState: true
+    permissions: { location: allow }
+- assertVisible: "Nearby services"
+- tapOn: "Pharmacy"
+- assertVisible: "Searching from.*"
+- tapOn: "GP"
+- assertVisible: "Nearest services, closest first"
+- tapOn:
+    text: ".*away.*"
+    index: 0
+- assertVisible: "Get directions"
