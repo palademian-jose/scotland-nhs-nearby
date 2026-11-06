@@ -12,6 +12,7 @@ export function CategoryChips({ selected, onSelect }: Props) {
   return (
     <ScrollView
       horizontal
+      style={styles.scroll}
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.row}
       accessibilityRole="tablist"
@@ -39,6 +40,7 @@ export function CategoryChips({ selected, onSelect }: Props) {
 }
 
 const styles = StyleSheet.create({
+  scroll: { flexGrow: 0, flexShrink: 0 },
   row: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, gap: spacing.sm },
   chip: {
     minHeight: MIN_TARGET,

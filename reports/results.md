@@ -1,4 +1,4 @@
-### Golden set (40 queries, `fake-provider`, commit `c7c7dfe`)
+### Golden set (40 queries, `fake-provider`, commit `5b52b59`)
 
 | Metric | Value | Provider |
 |---|---|---|
@@ -19,8 +19,8 @@ Failing cases (kept in the set on purpose):
 
 | Database | Rows | p50 (HTTP) | p95 (HTTP) | p50 (SQL only) | p95 (SQL only) |
 |---|---|---|---|---|---|
-| sample (committed CSVs, in memory) | 230 | 13.165 ms | 21.246 ms | 5.533 ms | 8.728 ms |
-| full (data/nhs.duckdb) | 3442 | 17.577 ms | 26.922 ms | 10.751 ms | 18.11 ms |
+| sample (committed CSVs, in memory) | 230 | 10.957 ms | 15.557 ms | 4.659 ms | 7.372 ms |
+| full (data/nhs.duckdb) | 3442 | 17.322 ms | 25.952 ms | 10.393 ms | 17.152 ms |
 
 ### Dataset rows per category
 
@@ -37,5 +37,8 @@ Failing cases (kept in the set on purpose):
 
 ### Web bundle size (`expo export --platform web`)
 
-Not measured yet: run `make web-build` then `make results`.
+| Artifact | Size |
+|---|---|
+| Entry JavaScript (minified) | 1090.2 KB (285.7 KB gzip) |
+| Whole `dist/` directory | 1385.4 KB across 31 files |
 

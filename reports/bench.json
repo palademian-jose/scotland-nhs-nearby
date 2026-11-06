@@ -6,21 +6,21 @@
       "database": "sample (committed CSVs, in memory)",
       "rows": 230,
       "calls": 1000,
-      "http_p50_ms": 13.165,
-      "http_p95_ms": 21.246,
-      "sql_p50_ms": 5.533,
-      "sql_p95_ms": 8.728,
-      "http_mean_ms": 14.013
+      "http_p50_ms": 10.957,
+      "http_p95_ms": 15.557,
+      "sql_p50_ms": 4.659,
+      "sql_p95_ms": 7.372,
+      "http_mean_ms": 11.353
     },
     {
       "database": "full (data/nhs.duckdb)",
       "rows": 3442,
       "calls": 1000,
-      "http_p50_ms": 17.577,
-      "http_p95_ms": 26.922,
-      "sql_p50_ms": 10.751,
-      "sql_p95_ms": 18.11,
-      "http_mean_ms": 17.936
+      "http_p50_ms": 17.322,
+      "http_p95_ms": 25.952,
+      "sql_p50_ms": 10.393,
+      "sql_p95_ms": 17.152,
+      "http_mean_ms": 17.707
     }
   ]
 }
