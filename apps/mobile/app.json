@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.palademian.nhsnearby"
@@ -33,7 +33,9 @@
         {
           "locationWhenInUsePermission": "Your location is used only to find the nearest NHS services. It is sent to the API as coordinates and is not stored."
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
