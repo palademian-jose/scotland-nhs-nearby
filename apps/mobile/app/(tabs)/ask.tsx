@@ -207,21 +207,23 @@ export default function AskScreen() {
                     style={[type.body, { color: colors.text }]}
                     accessibilityLiveRegion="polite"
                   >
-                    {result.answer}
-                    {result.citations.map((citation) => {
-                      const target = result.results.find((r) => r.id === citation.id);
+                    {result.answer.split(/(\[\d+\])/).map((part, partIndex) => {
+                      const marker = /^\[(\d+)\]$/.exec(part);
+                      if (!marker) {
+                        return part;
+                      }
+                      const index = Number(marker[1]);
+                      const citation = result.citations.find((c) => c.index === index);
+                      const target = citation && result.results.find((r) => r.id === citation.id);
                       return (
                         <Text
-                          key={citation.index}
+                          key={`${index}-${partIndex}`}
                           onPress={() => target && open(target)}
                           accessibilityRole="button"
-                          accessibilityLabel={`Source ${citation.index}: ${citation.name}`}
-                          style={[
-                            type.label,
-                            { color: colors.accent, backgroundColor: colors.accentSoft },
-                          ]}
+                          accessibilityLabel={`Source ${index}: ${citation?.name ?? ''}`}
+                          style={{ color: colors.accent, fontWeight: '600' }}
                         >
-                          {` ${citation.index} `}
+                          {part}
                         </Text>
                       );
                     })}
