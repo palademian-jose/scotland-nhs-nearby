@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 60
     rate_limit_burst: int = 20
 
+    cors_origins: str = "*"  # comma-separated; the data is public and the API holds no sessions
+
     # Tracing
     trace_path: Path = Path("traces/spans.jsonl")
     pricing_path: Path | None = None

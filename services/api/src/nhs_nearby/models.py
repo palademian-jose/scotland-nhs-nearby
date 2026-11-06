@@ -95,6 +95,8 @@ class AskResponse(BaseModel):
     refused: bool
     intent: Intent
     resolved_place: str | None = None
-    resolved_via: Literal["coordinates", "postcode", "gazetteer", "live_postcode", "none"] = "none"
+    resolved_via: Literal[
+        "coordinates", "postcode", "postcode_district", "gazetteer", "live_postcode", "none"
+    ] = "none"
     results: list[NearbyResult]
     citations: list[Citation]
