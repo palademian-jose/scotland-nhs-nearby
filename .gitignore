@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[oc]
+.venv
+.pytest_cache/
+.ruff_cache/
+*.egg-info
+build/
+dist/
+
+# Secrets and local config
+.env
+
+# Runtime artifacts (anchored to the repo root so source directories are never ignored)
+/data/raw/
+/data/nhs.duckdb
+/data/nhs.duckdb.wal
+/traces/
+/services/api/traces/
+
+# Node / Expo
+node_modules/
+.expo/
+/apps/mobile/dist/
+/apps/mobile/web-build/
+*.tsbuildinfo
+coverage/
