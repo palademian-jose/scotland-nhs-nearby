@@ -1,7 +1,7 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,10 +15,12 @@ import {
 import type { AskResponse, NearbyResult } from '../../src/api/types';
 import { CachedBadge } from '../../src/components/CachedBadge';
 import { FacilityRow } from '../../src/components/FacilityRow';
+import { ThinkingDots } from '../../src/components/Skeleton';
+import { Card, GUTTER, Screen, ScreenHeader } from '../../src/components/ui';
 import { STORAGE_KEYS } from '../../src/config';
 import { useApp } from '../../src/state/AppState';
 import { loadCache, saveCache } from '../../src/storage/cache';
-import { colors, MIN_TARGET, spacing } from '../../src/theme';
+import { MIN_TARGET, useTheme } from '../../src/theme';
 
 const EXAMPLES = [
   'nearest pharmacy to EH8 9YL',
@@ -28,6 +30,7 @@ const EXAMPLES = [
 
 export default function AskScreen() {
   const router = useRouter();
+  const { colors, radii, type } = useTheme();
   const { client, location } = useApp();
   const [question, setQuestion] = useState('');
   const [busy, setBusy] = useState(false);
@@ -75,128 +78,205 @@ export default function AskScreen() {
       params: { id: item.id, data: JSON.stringify(item) },
     });
 
+  const cannotSend = busy || question.trim().length === 0;
+
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.label} nativeID="ask-label">
-          Ask about GPs, pharmacies, dentists, hospitals or A&E
-        </Text>
-        <TextInput
-          value={question}
-          onChangeText={setQuestion}
-          placeholder="e.g. nearest pharmacy to EH8 9YL"
-          multiline
-          returnKeyType="send"
-          blurOnSubmit
-          onSubmitEditing={() => submit()}
-          accessibilityLabel="Your question"
-          accessibilityHint="Type where you are and what you need"
-          style={styles.input}
-        />
-        <Pressable
-          onPress={() => submit()}
-          disabled={busy || question.trim().length === 0}
-          accessibilityRole="button"
-          accessibilityLabel="Ask"
-          accessibilityState={{ disabled: busy || question.trim().length === 0, busy }}
-          style={[styles.button, (busy || question.trim().length === 0) && styles.disabled]}
-        >
-          <Text style={styles.buttonText}>{busy ? 'Asking...' : 'Ask'}</Text>
-        </Pressable>
+    <Screen>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <ScreenHeader
+            title="Ask"
+            subtitle="Plain-English questions about NHS services near you"
+          />
 
-        <View style={styles.examples}>
-          {EXAMPLES.map((example) => (
-            <Pressable
-              key={example}
-              onPress={() => submit(example)}
-              accessibilityRole="button"
-              accessibilityLabel={`Try: ${example}`}
-              style={styles.example}
-            >
-              <Text style={styles.exampleText}>{example}</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        {busy && <ActivityIndicator accessibilityLabel="Waiting for the answer" />}
-        {error && (
-          <Text style={styles.error} accessibilityRole="alert">
-            {error}
-          </Text>
-        )}
-        {cachedAt !== null && <CachedBadge savedAt={cachedAt} reason="Last answer shown." />}
-
-        {result && (
-          <View style={styles.answerBox} accessibilityLiveRegion="polite">
-            <Text style={[styles.answer, result.refused && styles.refused]}>{result.answer}</Text>
-            {result.resolved_via === 'postcode_district' && (
-              <Text style={styles.note}>
-                That postcode is not in the offline data, so the search started from the middle of
-                its postcode district.
-              </Text>
-            )}
-            {result.results.length > 0 && (
-              <Text style={styles.sources}>
-                Sources: {result.results[0]?.source_dataset} (Open Government Licence v3.0)
-              </Text>
-            )}
+          <View
+            style={[
+              styles.inputCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.borderStrong,
+                borderRadius: radii.lg,
+              },
+            ]}
+          >
+            <TextInput
+              value={question}
+              onChangeText={setQuestion}
+              placeholder="e.g. nearest pharmacy to EH8 9YL"
+              placeholderTextColor={colors.textSecondary}
+              multiline
+              returnKeyType="send"
+              blurOnSubmit
+              onSubmitEditing={() => submit()}
+              accessibilityLabel="Your question"
+              accessibilityHint="Type where you are and what you need"
+              style={[type.body, styles.input, { color: colors.text }]}
+            />
+            <View style={styles.sendRow}>
+              <Pressable
+                onPress={() => submit()}
+                disabled={cannotSend}
+                accessibilityRole="button"
+                accessibilityLabel="Ask"
+                accessibilityState={{ disabled: cannotSend, busy }}
+                style={({ pressed }) => [
+                  styles.send,
+                  { backgroundColor: colors.accent },
+                  cannotSend && styles.disabled,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Ionicons name="arrow-up" size={22} color={colors.onAccent} />
+              </Pressable>
+            </View>
           </View>
-        )}
-        {result?.results.map((item, index) => (
-          <FacilityRow key={item.id} item={item} index={index + 1} onPress={open} />
-        ))}
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.suggestionScroll}
+            contentContainerStyle={styles.suggestions}
+          >
+            {EXAMPLES.map((example) => (
+              <Pressable
+                key={example}
+                onPress={() => submit(example)}
+                accessibilityRole="button"
+                accessibilityLabel={`Try: ${example}`}
+                style={({ pressed }) => [
+                  styles.suggestion,
+                  { backgroundColor: colors.surfaceMuted, borderRadius: radii.pill },
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={[type.body, { color: colors.textSecondary }]}>{example}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          {error && (
+            <View style={styles.results}>
+              <Text style={[type.body, { color: colors.danger }]} accessibilityRole="alert">
+                {error}
+              </Text>
+            </View>
+          )}
+          {cachedAt !== null && !busy && (
+            <View style={styles.cachedWrap}>
+              <CachedBadge savedAt={cachedAt} reason="Last answer shown." />
+            </View>
+          )}
+
+          {busy && (
+            <View style={styles.results}>
+              <Card>
+                <ThinkingDots />
+              </Card>
+            </View>
+          )}
+
+          {result && !busy && (
+            <View style={styles.results}>
+              {result.refused ? (
+                <View
+                  style={[
+                    styles.refusal,
+                    { backgroundColor: colors.warningBg, borderRadius: radii.lg },
+                  ]}
+                  accessibilityLiveRegion="polite"
+                >
+                  <Ionicons name="information-circle" size={22} color={colors.warningText} />
+                  <Text style={[type.body, styles.flex, { color: colors.warningText }]}>
+                    {result.answer}
+                  </Text>
+                </View>
+              ) : (
+                <Card style={styles.answer}>
+                  <View accessibilityLiveRegion="polite" style={styles.answerBody}>
+                    <Text style={[type.body, { color: colors.text }]}>{result.answer}</Text>
+                    {result.resolved_via === 'postcode_district' && (
+                      <Text style={[type.caption, { color: colors.textSecondary }]}>
+                        That postcode is not in the offline data, so the search started from the
+                        middle of its postcode district.
+                      </Text>
+                    )}
+                  </View>
+                  {result.citations.length > 0 && (
+                    <View style={styles.citations}>
+                      {result.citations.map((citation) => {
+                        const target = result.results.find((r) => r.id === citation.id);
+                        return (
+                          <Pressable
+                            key={citation.index}
+                            onPress={() => target && open(target)}
+                            hitSlop={8}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Source ${citation.index}: ${citation.name}`}
+                            style={({ pressed }) => [
+                              styles.citation,
+                              { backgroundColor: colors.accentSoft },
+                              pressed && styles.pressed,
+                            ]}
+                          >
+                            <Text style={[type.label, { color: colors.accent, fontWeight: '600' }]}>
+                              {citation.index}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  )}
+                  {result.results.length > 0 && (
+                    <Text style={[type.caption, { color: colors.textTertiary }]}>
+                      Sources: {result.results[0]?.source_dataset} (Open Government Licence v3.0)
+                    </Text>
+                  )}
+                </Card>
+              )}
+              {result.results.map((item, index) => (
+                <FacilityRow key={item.id} item={item} index={index + 1} onPress={open} />
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, gap: spacing.md },
-  label: { fontSize: 16, fontWeight: '600', color: colors.text },
-  input: {
-    minHeight: 80,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: spacing.md,
-    fontSize: 17,
-    color: colors.text,
-    backgroundColor: colors.surface,
-    textAlignVertical: 'top',
-  },
-  button: {
-    minHeight: MIN_TARGET,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
+  flex: { flex: 1 },
+  content: { paddingBottom: 32 },
+  inputCard: { marginHorizontal: GUTTER, padding: 14, borderWidth: 1 },
+  input: { minHeight: 56, textAlignVertical: 'top', padding: 0 },
+  sendRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 },
+  send: {
+    width: MIN_TARGET,
+    height: MIN_TARGET,
+    borderRadius: MIN_TARGET / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  disabled: { opacity: 0.5 },
-  buttonText: { color: colors.onPrimary, fontSize: 17, fontWeight: '700' },
-  examples: { gap: spacing.sm },
-  example: {
-    minHeight: MIN_TARGET,
+  disabled: { opacity: 0.4 },
+  pressed: { opacity: 0.7 },
+  suggestionScroll: { flexGrow: 0, marginTop: 12 },
+  suggestions: { paddingHorizontal: GUTTER, gap: 8 },
+  suggestion: { minHeight: MIN_TARGET, justifyContent: 'center', paddingHorizontal: 16 },
+  results: { paddingHorizontal: GUTTER, gap: 12, marginTop: 16 },
+  cachedWrap: { marginTop: 16 },
+  refusal: { flexDirection: 'row', gap: 12, padding: 16, alignItems: 'flex-start' },
+  answer: { gap: 12 },
+  answerBody: { gap: 8 },
+  citations: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  citation: {
+    minWidth: 28,
+    height: 28,
+    borderRadius: 14,
+    paddingHorizontal: 8,
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
   },
-  exampleText: { color: colors.primary, fontSize: 15 },
-  error: { color: colors.danger, fontSize: 15 },
-  answerBox: {
-    padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    gap: spacing.sm,
-  },
-  answer: { fontSize: 17, color: colors.text, lineHeight: 24 },
-  refused: { color: colors.warningText },
-  note: { fontSize: 14, color: colors.textMuted },
-  sources: { fontSize: 13, color: colors.textMuted },
 });

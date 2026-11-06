@@ -1,13 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput } from 'react-native';
+import { type ReactNode, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { Button, Card, GUTTER, Screen, ScreenHeader } from '../../src/components/ui';
 import { STORAGE_KEYS } from '../../src/config';
 import { useApp } from '../../src/state/AppState';
-import { colors, MIN_TARGET, spacing } from '../../src/theme';
+import { MIN_TARGET, useTheme } from '../../src/theme';
+
+function Group({ title, children }: { title: string; children: ReactNode }) {
+  const { colors, type } = useTheme();
+  return (
+    <View style={styles.group}>
+      <Text style={[type.label, styles.groupTitle, { color: colors.textSecondary }]}>{title}</Text>
+      <Card style={styles.card}>{children}</Card>
+    </View>
+  );
+}
 
 export default function SettingsScreen() {
+  const { colors, radii, type } = useTheme();
   const { apiUrl, setApiUrl, location, retryGps } = useApp();
   const [edited, setDraft] = useState<string | null>(null);
   const draft = edited ?? apiUrl;
@@ -39,105 +51,102 @@ export default function SettingsScreen() {
     setNote('Saved results and postcode cleared.');
   };
 
+  const dotColor =
+    permission === 'granted'
+      ? colors.accent
+      : permission === 'denied'
+        ? colors.danger
+        : colors.textTertiary;
+
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.heading} accessibilityRole="header">
-        API address
-      </Text>
-      <TextInput
-        value={draft}
-        onChangeText={setDraft}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="url"
-        accessibilityLabel="API address"
-        style={styles.input}
-      />
-      <Pressable
-        onPress={save}
-        accessibilityRole="button"
-        accessibilityLabel="Save API address"
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Save</Text>
-      </Pressable>
+    <Screen>
+      <ScrollView contentContainerStyle={styles.content}>
+        <ScreenHeader title="Settings" subtitle="Connection, location and saved data" />
 
-      <Text style={styles.heading} accessibilityRole="header">
-        Location
-      </Text>
-      <Text style={styles.text}>Permission: {permission}</Text>
-      <Text style={styles.text}>
-        Searching from: {location.label || 'not set'} ({location.status})
-      </Text>
-      <Pressable
-        onPress={retryGps}
-        accessibilityRole="button"
-        accessibilityLabel="Request location permission again"
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Use my current location</Text>
-      </Pressable>
+        <Group title="API address">
+          <TextInput
+            value={draft}
+            onChangeText={setDraft}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            accessibilityLabel="API address"
+            style={[
+              type.body,
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.surface,
+                borderColor: colors.borderStrong,
+                borderRadius: radii.md,
+              },
+            ]}
+          />
+          <Button label="Save" accessibilityLabel="Save API address" onPress={save} />
+        </Group>
 
-      <Text style={styles.heading} accessibilityRole="header">
-        Saved data
-      </Text>
-      <Pressable
-        onPress={clearCache}
-        accessibilityRole="button"
-        accessibilityLabel="Clear saved results"
-        style={styles.secondary}
-      >
-        <Text style={styles.secondaryText}>Clear saved results</Text>
-      </Pressable>
-      {note && (
-        <Text style={styles.note} accessibilityLiveRegion="polite">
-          {note}
-        </Text>
-      )}
+        <Group title="Location">
+          <View style={styles.statusRow}>
+            <View style={[styles.dot, { backgroundColor: dotColor }]} />
+            <Text style={[type.body, styles.flex, { color: colors.text }]}>
+              Permission: {permission}
+            </Text>
+          </View>
+          <Text style={[type.caption, { color: colors.textSecondary }]}>
+            Searching from: {location.label || 'not set'} ({location.status})
+          </Text>
+          <Button
+            label="Use my current location"
+            accessibilityLabel="Request location permission again"
+            variant="soft"
+            icon="navigate"
+            onPress={retryGps}
+          />
+        </Group>
 
-      <Text style={styles.heading} accessibilityRole="header">
-        About
-      </Text>
-      <Text style={styles.text}>
-        Data: NHS Scotland open data (opendata.nhs.scot), Open Government Licence v3.0. Postcodes
-        are geocoded with postcodes.io. Map tiles: OpenStreetMap contributors. This app is not an
-        official NHS service and gives no medical advice. In an emergency call 999; for urgent
-        advice call NHS 24 on 111.
-      </Text>
-    </ScrollView>
+        <Group title="Saved data">
+          <Button
+            label="Clear saved results"
+            variant="soft"
+            icon="trash-outline"
+            onPress={clearCache}
+          />
+          {note && (
+            <Text
+              style={[type.caption, { color: colors.textSecondary }]}
+              accessibilityLiveRegion="polite"
+            >
+              {note}
+            </Text>
+          )}
+        </Group>
+
+        <Group title="Appearance">
+          <Text style={[type.body, { color: colors.text }]}>
+            The theme follows your device setting, light or dark.
+          </Text>
+        </Group>
+
+        <Group title="About">
+          <Text style={[type.caption, { color: colors.textSecondary }]}>
+            Data: NHS Scotland open data (opendata.nhs.scot), Open Government Licence v3.0.
+            Postcodes are geocoded with postcodes.io. Map tiles: OpenStreetMap contributors. This
+            app is not an official NHS service and gives no medical advice. In an emergency call
+            999; for urgent advice call NHS 24 on 111.
+          </Text>
+        </Group>
+      </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.lg, gap: spacing.md },
-  heading: { fontSize: 20, fontWeight: '700', color: colors.text, marginTop: spacing.md },
-  text: { fontSize: 15, color: colors.text, lineHeight: 22 },
-  input: {
-    minHeight: MIN_TARGET,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-    color: colors.text,
-    backgroundColor: colors.surface,
-  },
-  button: {
-    minHeight: MIN_TARGET,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
-  secondary: {
-    minHeight: MIN_TARGET,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryText: { color: colors.primary, fontSize: 16, fontWeight: '700' },
-  note: { color: colors.textMuted, fontSize: 14 },
+  flex: { flex: 1 },
+  content: { paddingBottom: 32 },
+  group: { paddingHorizontal: GUTTER, marginBottom: 20, gap: 8 },
+  groupTitle: { paddingHorizontal: 4 },
+  card: { gap: 12 },
+  input: { minHeight: MIN_TARGET + 4, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 10 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  dot: { width: 10, height: 10, borderRadius: 5 },
 });

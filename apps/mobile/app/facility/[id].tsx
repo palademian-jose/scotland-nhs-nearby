@@ -1,11 +1,23 @@
-import { useLocalSearchParams } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import {
+  ActivityIndicator,
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CATEGORY_LABELS, type Facility, type NearbyResult } from '../../src/api/types';
+import { CATEGORY_ICONS } from '../../src/components/categoryIcons';
+import { Badge, Button, Card, GUTTER } from '../../src/components/ui';
 import { directionsUrl, formatDistance, haversineKm } from '../../src/lib/geo';
 import { useApp } from '../../src/state/AppState';
-import { colors, MIN_TARGET, spacing } from '../../src/theme';
+import { MIN_TARGET, useTheme } from '../../src/theme';
 
 function parseItem(data: string | undefined): Facility | null {
   if (!data) {
@@ -22,8 +34,21 @@ function parseItem(data: string | undefined): Facility | null {
   return null;
 }
 
+function Row({ label, value }: { label: string; value: string }) {
+  const { colors, type } = useTheme();
+  return (
+    <View style={styles.row}>
+      <Text style={[type.caption, styles.key, { color: colors.textSecondary }]}>{label}</Text>
+      <Text style={[type.body, styles.value, { color: colors.text }]}>{value}</Text>
+    </View>
+  );
+}
+
 export default function DetailsScreen() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { colors, shadow, type } = useTheme();
   const { client, location } = useApp();
   const [item, setItem] = useState<Facility | null>(() => parseItem(params.data));
   const [error, setError] = useState<string | null>(null);
@@ -38,87 +63,139 @@ export default function DetailsScreen() {
       .catch((e: unknown) => setError(e instanceof Error ? e.message : 'Request failed'));
   }, [client, item, params.id]);
 
-  if (error) {
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/'));
+
+  const backButton = (
+    <Pressable
+      onPress={goBack}
+      accessibilityRole="button"
+      accessibilityLabel="Go back"
+      style={({ pressed }) => [
+        styles.back,
+        shadow,
+        { top: insets.top + 8, backgroundColor: colors.surface },
+        pressed && styles.pressed,
+      ]}
+    >
+      <Ionicons name="chevron-back" size={22} color={colors.text} />
+    </Pressable>
+  );
+
+  if (error || !item) {
     return (
-      <Text style={styles.error} accessibilityRole="alert">
-        {error}
-      </Text>
+      <View style={[styles.screen, { backgroundColor: colors.background }]}>
+        {error ? (
+          <Text
+            style={[
+              type.body,
+              styles.message,
+              { color: colors.danger, paddingTop: insets.top + 72 },
+            ]}
+            accessibilityRole="alert"
+          >
+            {error}
+          </Text>
+        ) : (
+          <ActivityIndicator
+            accessibilityLabel="Loading details"
+            color={colors.accent}
+            style={styles.message}
+          />
+        )}
+        {backButton}
+      </View>
     );
-  }
-  if (!item) {
-    return <ActivityIndicator accessibilityLabel="Loading details" style={styles.loading} />;
   }
 
   const distance =
     (item as NearbyResult).distance_km ??
     (location.coords ? haversineKm(location.coords, { lat: item.lat, lon: item.lon }) : null);
+  const address = `${item.address ? `${item.address}, ` : ''}${item.postcode}`;
+  const phone = item.phone;
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.name} accessibilityRole="header">
-        {item.name}
-      </Text>
-      <Text style={styles.category}>{CATEGORY_LABELS[item.category]}</Text>
-      {distance !== null && <Text style={styles.text}>{formatDistance(distance)} away</Text>}
-      <Text style={styles.label}>Address</Text>
-      <Text style={styles.text}>
-        {item.address ? `${item.address}, ` : ''}
-        {item.postcode}
-      </Text>
-      {item.phone && (
-        <>
-          <Text style={styles.label}>Phone</Text>
-          <Pressable
-            onPress={() => Linking.openURL(`tel:${item.phone?.replace(/\s+/g, '')}`)}
-            accessibilityRole="link"
-            accessibilityLabel={`Call ${item.phone}`}
-            style={styles.link}
-          >
-            <Text style={styles.linkText}>{item.phone}</Text>
-          </Pressable>
-        </>
-      )}
-      <Text style={styles.label}>Health board</Text>
-      <Text style={styles.text}>{item.health_board}</Text>
-      <Pressable
-        onPress={() => Linking.openURL(directionsUrl(item))}
-        accessibilityRole="button"
-        accessibilityLabel={`Get directions to ${item.name}`}
-        style={styles.button}
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 72 }]}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.buttonText}>Get directions</Text>
-      </Pressable>
-      <Text style={styles.source}>
-        Source: {item.source_dataset}. Open Government Licence v3.0. Check opening hours with the
-        service before you travel.
-      </Text>
-    </ScrollView>
+        <View style={[styles.heroIcon, { backgroundColor: colors.accentSoft }]}>
+          <Ionicons name={CATEGORY_ICONS[item.category]} size={30} color={colors.accent} />
+        </View>
+        <Text style={[type.display, { color: colors.text }]} accessibilityRole="header">
+          {item.name}
+        </Text>
+        <Text style={[type.body, { color: colors.textSecondary }]}>{address}</Text>
+        <View style={styles.chips}>
+          <Badge>{CATEGORY_LABELS[item.category]}</Badge>
+          <Badge tone="muted">{item.health_board}</Badge>
+          {distance !== null && <Badge>{`${formatDistance(distance)} away`}</Badge>}
+        </View>
+
+        <View style={styles.actions}>
+          <Button
+            label="Directions"
+            accessibilityLabel={`Get directions to ${item.name}`}
+            variant="soft"
+            icon="navigate"
+            onPress={() => Linking.openURL(directionsUrl(item))}
+            style={styles.action}
+          />
+          {phone && (
+            <Button
+              label="Call"
+              accessibilityLabel={`Call ${phone}`}
+              variant="soft"
+              icon="call"
+              onPress={() => Linking.openURL(`tel:${phone.replace(/\s+/g, '')}`)}
+              style={styles.action}
+            />
+          )}
+        </View>
+
+        <Card style={styles.meta}>
+          <Row label="Postcode" value={item.postcode} />
+          {phone && <Row label="Phone" value={phone} />}
+          <Row label="Health board" value={item.health_board} />
+          <Row label="Source dataset" value={item.source_dataset} />
+          <Row label="Licence" value="Open Government Licence v3.0" />
+        </Card>
+        <Text style={[type.caption, { color: colors.textSecondary }]}>
+          Check opening hours with the service before you travel.
+        </Text>
+      </ScrollView>
+      {backButton}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.lg, gap: spacing.sm },
-  loading: { padding: spacing.xl },
-  error: { padding: spacing.lg, color: colors.danger, fontSize: 16 },
-  name: { fontSize: 24, fontWeight: '700', color: colors.text },
-  category: { fontSize: 16, color: colors.primary, fontWeight: '600' },
-  label: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginTop: spacing.md,
-    textTransform: 'uppercase',
-  },
-  text: { fontSize: 17, color: colors.text },
-  link: { minHeight: MIN_TARGET, justifyContent: 'center' },
-  linkText: { fontSize: 17, color: colors.primary, textDecorationLine: 'underline' },
-  button: {
-    minHeight: MIN_TARGET,
-    marginTop: spacing.lg,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
+  screen: { flex: 1 },
+  message: { padding: GUTTER },
+  content: { paddingHorizontal: GUTTER, paddingBottom: 40, gap: 12 },
+  back: {
+    position: 'absolute',
+    left: GUTTER,
+    width: MIN_TARGET,
+    height: MIN_TARGET,
+    borderRadius: MIN_TARGET / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonText: { color: colors.onPrimary, fontSize: 17, fontWeight: '700' },
-  source: { marginTop: spacing.lg, fontSize: 13, color: colors.textMuted },
+  pressed: { opacity: 0.7 },
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+  actions: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  action: { flex: 1 },
+  meta: { gap: 14, marginTop: 8 },
+  row: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
+  key: { width: 104, paddingTop: 2 },
+  value: { flex: 1 },
 });
