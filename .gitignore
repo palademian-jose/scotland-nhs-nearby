@@ -25,3 +25,4 @@ node_modules/
 /apps/mobile/web-build/
 *.tsbuildinfo
 coverage/
+/reports/eval-traces.jsonl
