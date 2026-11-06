@@ -40,5 +40,5 @@ Failing cases (kept in the set on purpose):
 | Artifact | Size |
 |---|---|
 | Entry JavaScript (minified) | 1090.2 KB (285.7 KB gzip) |
-| Whole `dist/` directory | 1385.4 KB across 31 files |
+| Whole `dist/` directory | 1845.2 KB across 32 files |
 
