@@ -1,0 +1,4 @@
+HB,TreatmentLocationName,TreatmentLocationCode,TreatmentLocationPostcode,CurrentDepartmentType,FileType,Comments,Status
+S08000015,University Hospital Ayr,A210H,KA6 6DX,Type 1,Episode,None,Open
+S08000015,Old Minor Injuries Unit,A999H,KA1 1AA,Minor Injury Unit or Other,Episode,None,Open
+S08000015,Closed Hospital,A998H,KA1 1AB,Type 1,Episode,None,Closed
