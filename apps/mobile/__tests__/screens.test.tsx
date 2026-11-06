@@ -75,7 +75,8 @@ describe('Nearby screen', () => {
     await fireEvent.press(screen.getByLabelText('GP'));
     await waitFor(() => expect(fetchFn).toHaveBeenCalledTimes(2));
     expect(String(fetchFn.mock.calls[1]?.[0])).toContain('category=gp');
-    expect(await screen.findByText('No results.')).toBeOnTheScreen();
+    expect(await screen.findByText('No results')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Try another location' })).toBeOnTheScreen();
   });
 
   it('shows the last results with a cached badge when the server is unreachable', async () => {
@@ -121,7 +122,8 @@ describe('Ask screen', () => {
     await fireEvent.changeText(screen.getByLabelText('Your question'), 'nearest pharmacy to Leith');
     await fireEvent.press(screen.getByRole('button', { name: 'Ask' }));
     expect(await screen.findByText(ASK_OK.answer)).toBeOnTheScreen();
-    expect(screen.getByText(/\[1\] Leith Pharmacy/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Leith Pharmacy, Pharmacy/)).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Source 1: Leith Pharmacy' })).toBeOnTheScreen();
     expect(screen.getByText(/Open Government Licence v3.0/)).toBeOnTheScreen();
     const init = fetchFn.mock.calls[0]?.[1];
     expect(JSON.parse(init?.body as string)).toEqual({
