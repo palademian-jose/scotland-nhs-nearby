@@ -3,9 +3,9 @@ appId: dev.palademian.nhsnearby
 - launchApp:
     clearState: true
     permissions: { location: allow }
-- tapOn: "Ask a question"
-- tapOn: "Your question"
-- inputText: "nearest pharmacy to EH8 9YL"
-- tapOn: "Ask"
-- assertVisible: ".*nearest pharmacy.*"
-- assertVisible: "Sources:.*"
+- tapOn: 'Ask a question'
+- tapOn: 'Your question'
+- inputText: 'nearest pharmacy to EH8 9YL'
+- tapOn: 'Ask'
+- assertVisible: '.*nearest pharmacy.*'
+- assertVisible: 'Sources:.*'

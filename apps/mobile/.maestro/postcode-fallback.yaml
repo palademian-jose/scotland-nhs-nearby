@@ -4,8 +4,8 @@ appId: dev.palademian.nhsnearby
 - launchApp:
     clearState: true
     permissions: { location: deny }
-- assertVisible: "Where are you?"
-- tapOn: "Postcode"
-- inputText: "EH8 9YL"
-- tapOn: "Use this postcode"
-- assertVisible: "From: EH8 9YL.*"
+- assertVisible: 'Where are you?'
+- tapOn: 'Postcode'
+- inputText: 'EH8 9YL'
+- tapOn: 'Use this postcode'
+- assertVisible: 'From: EH8 9YL.*'

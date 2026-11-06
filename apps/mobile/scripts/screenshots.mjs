@@ -74,7 +74,10 @@ try {
   await page.goto(WEB);
 
   await page.getByText(/^From:/).waitFor({ timeout: 30000 });
-  await page.getByText(/ km$| m$/).first().waitFor({ timeout: 30000 });
+  await page
+    .getByText(/ km$| m$/)
+    .first()
+    .waitFor({ timeout: 30000 });
   await page.screenshot({ path: resolve(out, 'nearby-list.png') });
 
   await page.getByRole('button', { name: 'Show map' }).click();

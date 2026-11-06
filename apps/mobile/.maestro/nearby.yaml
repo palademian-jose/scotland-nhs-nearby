@@ -5,12 +5,12 @@ appId: dev.palademian.nhsnearby
 - launchApp:
     clearState: true
     permissions: { location: allow }
-- assertVisible: "Nearby services"
-- tapOn: "Pharmacy"
-- assertVisible: "Searching from.*"
-- tapOn: "GP"
-- assertVisible: "Nearest services, closest first"
+- assertVisible: 'Nearby services'
+- tapOn: 'Pharmacy'
+- assertVisible: 'Searching from.*'
+- tapOn: 'GP'
+- assertVisible: 'Nearest services, closest first'
 - tapOn:
-    text: ".*away.*"
+    text: '.*away.*'
     index: 0
-- assertVisible: "Get directions"
+- assertVisible: 'Get directions'

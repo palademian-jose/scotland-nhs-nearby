@@ -45,7 +45,7 @@ class AnthropicClient:
         name = model or self.default_model
         if (
             "/" in name
-        ):  # OpenRouter slug -> bare Anthropic id (claude-sonnet-4.5 -> claude-sonnet-5-5)
+        ):  # OpenRouter slug -> bare Anthropic id (claude-sonnet-5.5 -> claude-sonnet-5-5)
             name = name.split("/", 1)[1].replace(".", "-")
         return name
 
