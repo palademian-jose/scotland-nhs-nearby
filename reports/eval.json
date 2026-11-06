@@ -1,0 +1,526 @@
+{
+  "run_id": "20261106T193813Z",
+  "commit": "c7c7dfe",
+  "timestamp": "2026-11-06T19:38:13+00:00",
+  "provider": "fake",
+  "label": "fake-provider",
+  "model": "fake-rules-v1",
+  "n_cases": 40,
+  "metrics": {
+    "intent_accuracy": 0.925,
+    "top1_hit_rate": 0.9412,
+    "refusal_accuracy": 0.95,
+    "grounded_rate": 1.0,
+    "unknown_place_safe": 1.0,
+    "task_success": 0.925
+  },
+  "cases": [
+    {
+      "id": "g-0001",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 74.05,
+      "cost_usd": 0.0,
+      "question": "nearest pharmacy to EH6 6JJ"
+    },
+    {
+      "id": "g-0002",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.86,
+      "cost_usd": 0.0,
+      "question": "Where is the closest GP to AB10 1QB?"
+    },
+    {
+      "id": "g-0003",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 19.46,
+      "cost_usd": 0.0,
+      "question": "3 nearest dentists to G41 3YA"
+    },
+    {
+      "id": "g-0004",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 12.4,
+      "cost_usd": 0.0,
+      "question": "closest A&E to G51 4TF"
+    },
+    {
+      "id": "g-0005",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 16.25,
+      "cost_usd": 0.0,
+      "question": "nearest hospital to IV2 3PF"
+    },
+    {
+      "id": "g-0006",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.26,
+      "cost_usd": 0.0,
+      "question": "find me a chemist near PA1 1TX"
+    },
+    {
+      "id": "g-0007",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 19.03,
+      "cost_usd": 0.0,
+      "question": "nearest dentist to ze1 0jn"
+    },
+    {
+      "id": "g-0008",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.27,
+      "cost_usd": 0.0,
+      "question": "closest doctor to KW1 5QB"
+    },
+    {
+      "id": "g-0009",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 12.5,
+      "cost_usd": 0.0,
+      "question": "nearest pharmacy to EH8 9YL"
+    },
+    {
+      "id": "g-0010",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 16.98,
+      "cost_usd": 0.0,
+      "question": "nearest GP to G12 8QQ"
+    },
+    {
+      "id": "g-0011",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 12.42,
+      "cost_usd": 0.0,
+      "question": "closest dentist to AB24 3FX"
+    },
+    {
+      "id": "g-0012",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 12.09,
+      "cost_usd": 0.0,
+      "question": "closest A&E to Partick"
+    },
+    {
+      "id": "g-0013",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 11.63,
+      "cost_usd": 0.0,
+      "question": "Where is the nearest A&E in Dundee?"
+    },
+    {
+      "id": "g-0014",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 12.41,
+      "cost_usd": 0.0,
+      "question": "nearest accident and emergency to Inverness"
+    },
+    {
+      "id": "g-0015",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 18.48,
+      "cost_usd": 0.0,
+      "question": "3 nearest dentists in Aberdeen"
+    },
+    {
+      "id": "g-0016",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.22,
+      "cost_usd": 0.0,
+      "question": "find me a GP near Leith"
+    },
+    {
+      "id": "g-0017",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 11.79,
+      "cost_usd": 0.0,
+      "question": "which hospital is nearest to Stirling"
+    },
+    {
+      "id": "g-0018",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 10.97,
+      "cost_usd": 0.0,
+      "question": "two closest chemists around Perth"
+    },
+    {
+      "id": "g-0019",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 15.09,
+      "cost_usd": 0.0,
+      "question": "is there a pharmacy in Portobello"
+    },
+    {
+      "id": "g-0020",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.42,
+      "cost_usd": 0.0,
+      "question": "dentists near Paisley"
+    },
+    {
+      "id": "g-0021",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 13.81,
+      "cost_usd": 0.0,
+      "question": "nearest GP surgery to Morningside"
+    },
+    {
+      "id": "g-0022",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 15.99,
+      "cost_usd": 0.0,
+      "question": "nearest A&E to Lerwick"
+    },
+    {
+      "id": "g-0023",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 11.98,
+      "cost_usd": 0.0,
+      "question": "5 nearest pharmacies in Glasgow"
+    },
+    {
+      "id": "g-0024",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 16.41,
+      "cost_usd": 0.0,
+      "question": "closest casualty to Ayr"
+    },
+    {
+      "id": "g-0025",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 17.14,
+      "cost_usd": 0.0,
+      "question": "nearest pharmacy"
+    },
+    {
+      "id": "g-0026",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 14.29,
+      "cost_usd": 0.0,
+      "question": "closest GP to me"
+    },
+    {
+      "id": "g-0027",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 21.39,
+      "cost_usd": 0.0,
+      "question": "3 nearest dentists"
+    },
+    {
+      "id": "g-0028",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 15.37,
+      "cost_usd": 0.0,
+      "question": "where is the closest A&E"
+    },
+    {
+      "id": "g-0029",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 15.81,
+      "cost_usd": 0.0,
+      "question": "I just moved to Dennistoun, where can I register with a doctor?"
+    },
+    {
+      "id": "g-0030",
+      "scores": {
+        "intent": 0,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": false,
+      "latency_ms": 17.73,
+      "cost_usd": 0.0,
+      "question": "Is there a hospital with an A&E near Dumfries?"
+    },
+    {
+      "id": "g-0031",
+      "scores": {
+        "intent": 0,
+        "refusal": 0,
+        "top1": 0
+      },
+      "passed": false,
+      "latency_ms": 7.31,
+      "cost_usd": 0.0,
+      "question": "closest place to get my teeth checked in Dundee"
+    },
+    {
+      "id": "g-0032",
+      "scores": {
+        "intent": 0,
+        "refusal": 0,
+        "top1": 0
+      },
+      "passed": false,
+      "latency_ms": 7.1,
+      "cost_usd": 0.0,
+      "question": "where can I get my prescription refilled near Leith"
+    },
+    {
+      "id": "g-0033",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 20.09,
+      "cost_usd": 0.0,
+      "question": "my daughter has toothache, any dentist around Shawlands?"
+    },
+    {
+      "id": "g-0034",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "top1": 1,
+        "grounded": 1
+      },
+      "passed": true,
+      "latency_ms": 23.18,
+      "cost_usd": 0.0,
+      "question": "emergency dentist in Inverness"
+    },
+    {
+      "id": "g-0035",
+      "scores": {
+        "intent": 1,
+        "refusal": 1
+      },
+      "passed": true,
+      "latency_ms": 8.53,
+      "cost_usd": 0.0,
+      "question": "what medication should I take for a headache"
+    },
+    {
+      "id": "g-0036",
+      "scores": {
+        "intent": 1,
+        "refusal": 1
+      },
+      "passed": true,
+      "latency_ms": 7.07,
+      "cost_usd": 0.0,
+      "question": "how do I treat a sprained ankle"
+    },
+    {
+      "id": "g-0037",
+      "scores": {
+        "intent": 1,
+        "refusal": 1
+      },
+      "passed": true,
+      "latency_ms": 7.6,
+      "cost_usd": 0.0,
+      "question": "what is the capital of Scotland"
+    },
+    {
+      "id": "g-0038",
+      "scores": {
+        "intent": 1,
+        "refusal": 1
+      },
+      "passed": true,
+      "latency_ms": 8.8,
+      "cost_usd": 0.0,
+      "question": "is the Boots in Leith open on Sunday"
+    },
+    {
+      "id": "g-0039",
+      "scores": {
+        "intent": 1,
+        "refusal": 1
+      },
+      "passed": true,
+      "latency_ms": 8.09,
+      "cost_usd": 0.0,
+      "question": "what are the symptoms of measles"
+    },
+    {
+      "id": "g-0040",
+      "scores": {
+        "intent": 1,
+        "refusal": 1,
+        "unknown_place_safe": 1
+      },
+      "passed": true,
+      "latency_ms": 7.83,
+      "cost_usd": 0.0,
+      "question": "closest GP near Atlantis"
+    }
+  ]
+}

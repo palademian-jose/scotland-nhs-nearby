@@ -1,0 +1,8 @@
+# Regression gate for scripts/eval.py --gate evals.yaml (exit 1 when a metric is below its min).
+# Set from the fake-provider run; re-tune after the first real-provider run.
+metrics:
+  intent_accuracy: {min: 0.85}
+  top1_hit_rate: {min: 0.85}
+  refusal_accuracy: {min: 0.90}
+  grounded_rate: {min: 1.0}
+  unknown_place_safe: {min: 1.0}

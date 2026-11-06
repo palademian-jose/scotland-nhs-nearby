@@ -1,0 +1,26 @@
+{
+  "machine": "Windows AMD64, Python 3.12.13",
+  "note": "in-process ASGI test client; no network hop",
+  "runs": [
+    {
+      "database": "sample (committed CSVs, in memory)",
+      "rows": 230,
+      "calls": 1000,
+      "http_p50_ms": 13.165,
+      "http_p95_ms": 21.246,
+      "sql_p50_ms": 5.533,
+      "sql_p95_ms": 8.728,
+      "http_mean_ms": 14.013
+    },
+    {
+      "database": "full (data/nhs.duckdb)",
+      "rows": 3442,
+      "calls": 1000,
+      "http_p50_ms": 17.577,
+      "http_p95_ms": 26.922,
+      "sql_p50_ms": 10.751,
+      "sql_p95_ms": 18.11,
+      "http_mean_ms": 17.936
+    }
+  ]
+}
